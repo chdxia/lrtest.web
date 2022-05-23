@@ -6,6 +6,8 @@
 </template>
 
 <script>
+import pubsub from 'pubsub-js'
+
 export default {
   name: "AdminSchool",
   props:['getSchoolName'],
@@ -15,6 +17,17 @@ export default {
       address: "重庆花溪",
     };
   },
+  methods: {
+    demo(msgName,data){
+      console.log('有人发布了hello消息，hello消息的回执执行了',data,this)
+    }
+  },
+  mounted(){
+    this.pubId = pubsub.subscribe('hello',this.demo)
+  },
+  beforeDestroy(){
+    pubsub.unsubscribe(this.pubId)
+  }
 };
 </script>
 
