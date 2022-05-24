@@ -1,4 +1,4 @@
-# app
+# lrtest
 
 ## Project setup
 ```
