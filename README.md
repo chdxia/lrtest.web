@@ -1,4 +1,5 @@
-# lrtest-web
+# app
+
 ## Project setup
 ```
 npm install

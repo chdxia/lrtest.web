@@ -39,10 +39,18 @@ const mutations = {
 const state = {
   sum: 0,
 };
+//准备getters用于将state中的数据进行加工
+const getters = {
+  bigSum(state){
+    return state.sum*10
+  }
+};
+
 
 //创建并暴露stroe
 export default new Vuex.Store({
   actions,
   mutations,
   state,
+  getters
 });
