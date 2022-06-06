@@ -1,15 +1,15 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.name" placeholder="姓名" style="width: 100px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.email" placeholder="邮箱" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.name" placeholder="姓名" style="width: 90px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.email" placeholder="邮箱" style="width: 180px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.role" placeholder="权限" clearable class="filter-item" style="width: 90px">
         <el-option v-for="item in roleOptions" :key="item.key" :label="item.label" :value="item.key" />
       </el-select>
       <el-select v-model="listQuery.status" placeholder="状态" clearable class="filter-item" style="width: 90px">
         <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
-      <el-select v-model="listQuery.sort" style="width: 130px" class="filter-item" @change="handleFilter">
+      <el-select v-model="listQuery.sort" placeholder="排序" clearable style="width: 90px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in sortOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
       <el-button v-waves class="filter-item" style="margin-left: 10px" type="primary" icon="el-icon-search" @click="handleFilter">
@@ -38,7 +38,7 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="姓名" width="110px" align="center">
+      <el-table-column label="姓名" width="90px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
         </template>
@@ -53,7 +53,7 @@
           <span>{{ row.role | roleFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" class-name="status-col" width="100">
+      <el-table-column label="状态" class-name="status-col" width="90">
         <template slot-scope="{row}">
           <el-tag :type="getStatus(row.status) | statusFilter">
             {{ getStatus(row.status) }}
@@ -81,7 +81,7 @@
           <el-button v-if="row.status" size="mini" @click="handleModifyStatus(row,false)">
             停用
           </el-button>
-          <el-button v-if="row.status!=2" size="mini" type="danger" @click="handleDelete(row,$index)">
+          <el-button type="danger" size="mini" @click="handleDelete(row,$index)">
             删除
           </el-button>
         </template>
@@ -130,14 +130,14 @@ import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 const statusOptions = [
-  { label: '激活', value: true, display_name: 'info' },
+  { label: '激活', value: true, display_name: 'success' },
   { label: '停用', value: false, display_name: 'info' }
 ]
 
 const statusKeyValue = statusOptions.reduce((acc, cur) => {
   acc[cur.label] = cur.display_name
   return acc
-})
+}, {})
 
 const roleOptions = [
   { key: 1, label: 'admin' },
@@ -188,8 +188,8 @@ export default {
         { label: '停用', value: false, display_name: 'info' }
       ],
       sortOptions: [
-        { label: '按ID升序排列', value: '+id' },
-        { label: '按ID降序排列', value: '-id' }
+        { label: 'ID升序', value: '+id' },
+        { label: 'ID降序', value: '-id' }
       ],
       showReviewer: false,
       temp: {
@@ -207,7 +207,8 @@ export default {
         create: '新建用户'
       },
       rules: {
-        email: [{ required: true, message: '请填写邮箱', trigger: 'blur' }],
+        email: [{ required: true, message: '请填写邮箱', trigger: 'change' }],
+        password: [{ required: true, message: '请填写密码', trigger: 'blur' }],
         role: [{ required: true, message: '请选择权限', trigger: 'blur' }],
         status: [{ required: true, message: '请选择状态', trigger: 'blur' }]
       },
@@ -227,6 +228,12 @@ export default {
     },
     getList() {
       this.listLoading = true
+      for (const i in this.listQuery) {
+        if (this.listQuery[i] === '') {
+          this.listQuery[i] = undefined
+        }
+      }
+      console.log(this.listQuery)
       userList(this.listQuery).then(response => {
         this.list = response.data.users
         this.total = response.data.total
@@ -266,15 +273,16 @@ export default {
       this.temp = {
         id: undefined,
         name: undefined,
-        email: '',
-        password: '',
+        email: undefined,
+        password: undefined,
         role: undefined,
-        status: undefined
+        status: true
       }
     },
     handleCreate() {
       this.resetTemp()
       this.dialogStatus = 'create'
+      this.rules.password[0].required = true
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
@@ -302,6 +310,7 @@ export default {
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
+      this.rules.password[0].required = false
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
