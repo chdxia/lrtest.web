@@ -228,8 +228,8 @@ export default {
     getList() {
       this.listLoading = true
       userList(this.listQuery).then(response => {
-        this.list = response.data
-        this.total = 100
+        this.list = response.data.users
+        this.total = response.data.total
 
         // Just to simulate the time of the request
         setTimeout(() => {
