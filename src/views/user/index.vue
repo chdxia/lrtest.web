@@ -9,9 +9,6 @@
       <el-select v-model="listQuery.status" placeholder="状态" clearable class="filter-item" style="width: 90px">
         <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
-      <el-select v-model="listQuery.sort" placeholder="排序" clearable style="width: 90px" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in sortOptions" :key="item.value" :label="item.label" :value="item.value" />
-      </el-select>
       <el-button v-waves class="filter-item" style="margin-left: 10px" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
@@ -33,9 +30,9 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
-        <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
+      <el-table-column label="序号" align="center" width="60px">
+        <template slot-scope="{$index}">
+          <span>{{ (listQuery.page-1)*listQuery.limit + $index + 1 }}</span>
         </template>
       </el-table-column>
       <el-table-column label="姓名" width="90px" align="center">
@@ -60,18 +57,18 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" width="160px" align="center">
+      <el-table-column label="创建时间" prop="create_time" sortable="custom" width="160px" align="center" :class-name="getSortClass('create_time')">
         <template slot-scope="{row}">
           <span>{{ row.create_time }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="修改时间" width="160px" align="center">
+      <el-table-column label="修改时间" prop="update_time" sortable="custom" width="160px" align="center" :class-name="getSortClass('update_time')">
         <template slot-scope="{row}">
           <span>{{ row.update_time }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
-        <template slot-scope="{row,$index}">
+        <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             修改
           </el-button>
@@ -81,7 +78,7 @@
           <el-button v-if="row.status" size="mini" @click="handleModifyStatus(row,false)">
             停用
           </el-button>
-          <el-button type="danger" size="mini" @click="handleDelete(row,$index)">
+          <el-button type="danger" size="mini" @click="handleDelete(row)">
             删除
           </el-button>
         </template>
@@ -187,10 +184,6 @@ export default {
         { label: '激活', value: true, display_name: 'success' },
         { label: '停用', value: false, display_name: 'info' }
       ],
-      sortOptions: [
-        { label: 'ID升序', value: '+id' },
-        { label: 'ID降序', value: '-id' }
-      ],
       showReviewer: false,
       temp: {
         id: undefined,
@@ -238,10 +231,10 @@ export default {
         this.list = response.data.users
         this.total = response.data.total
 
-        // Just to simulate the time of the request
+        // 模拟请求的时间，request请求成功之前，会一直转圈
         setTimeout(() => {
           this.listLoading = false
-        }, 1.5 * 1000)
+        }, 0.3 * 1000)
       })
     },
     handleFilter() {
@@ -249,23 +242,40 @@ export default {
       this.getList()
     },
     handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
       row.status = status
+      const tempData = Object.assign({}, row)
+      updateUser(tempData).then(() => {
+        const index = this.list.findIndex(v => v.id === this.temp.id)
+        this.list.splice(index, 1, this.temp)
+        this.handleFilter()
+        this.$message({
+          message: '操作成功',
+          type: 'success'
+        })
+      })
     },
     sortChange(data) {
       const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
+      if (prop === 'create_time') {
+        this.sortByCreateTime(order)
+      }
+      if (prop === 'update_time') {
+        this.sortByUpdateTime(order)
       }
     },
-    sortByID(order) {
+    sortByCreateTime(order) {
       if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+        this.listQuery.sort = '+create_time'
       } else {
-        this.listQuery.sort = '-id'
+        this.listQuery.sort = '-create_time'
+      }
+      this.handleFilter()
+    },
+    sortByUpdateTime(order) {
+      if (order === 'ascending') {
+        this.listQuery.sort = '+update_time'
+      } else {
+        this.listQuery.sort = '-update_time'
       }
       this.handleFilter()
     },
@@ -291,15 +301,12 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          // this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          // this.temp.author = 'vue-element-admin'
           createUser(this.temp).then(() => {
-            // this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.handleFilter()
             this.$notify({
-              title: 'Success',
-              message: 'Created Successfully',
+              title: '成功',
+              message: '成功添加用户信息',
               type: 'success',
               duration: 2000
             })
@@ -326,8 +333,8 @@ export default {
             this.dialogFormVisible = false
             this.handleFilter()
             this.$notify({
-              title: 'Success',
-              message: 'Update Successfully',
+              title: '成功',
+              message: '成功修改用户信息',
               type: 'success',
               duration: 2000
             })
@@ -335,16 +342,15 @@ export default {
         }
       })
     },
-    handleDelete(row, index) {
+    handleDelete(row) {
       deleteUser(row.id).then(() => {
         this.handleFilter()
         this.$notify({
-          title: 'Success',
-          message: 'Delete Successfully',
+          title: '成功',
+          message: '成功删除用户信息',
           type: 'success',
           duration: 2000
         })
-        // this.list.splice(index, 1)
       })
     },
     handleDownload() {
