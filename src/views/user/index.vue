@@ -4,13 +4,13 @@
       <el-input v-model="listQuery.name" placeholder="姓名" style="width: 100px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-input v-model="listQuery.email" placeholder="邮箱" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.role" placeholder="权限" clearable class="filter-item" style="width: 90px">
-        <el-option v-for="item in roleOptions" :key="item" :label="item | roleFilter" :value="item" />
+        <el-option v-for="item in roleOptions" :key="item.key" :label="item.label" :value="item.key" />
       </el-select>
       <el-select v-model="listQuery.status" placeholder="状态" clearable class="filter-item" style="width: 90px">
-        <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
+        <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
       <el-select v-model="listQuery.sort" style="width: 130px" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
+        <el-option v-for="item in sortOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
       <el-button v-waves class="filter-item" style="margin-left: 10px" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
@@ -75,10 +75,10 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             修改
           </el-button>
-          <el-button v-if="!row.is_active" size="mini" type="success" @click="handleModifyStatus(row,'published')">
+          <el-button v-if="!row.status" size="mini" type="success" @click="handleModifyStatus(row,true)">
             激活
           </el-button>
-          <el-button v-if="row.is_active" size="mini" @click="handleModifyStatus(row,'draft')">
+          <el-button v-if="row.status" size="mini" @click="handleModifyStatus(row,false)">
             停用
           </el-button>
           <el-button v-if="row.status!=2" size="mini" type="danger" @click="handleDelete(row,$index)">
@@ -98,14 +98,17 @@
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="temp.email" />
         </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="temp.password" />
+        </el-form-item>
         <el-form-item label="权限" prop="role">
           <el-select v-model="temp.role" class="filter-item" placeholder="请选择权限">
-            <el-option v-for="item in roleOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+            <el-option v-for="item in roleOptions" :key="item.key" :label="item.label" :value="item.key" />
           </el-select>
         </el-form-item>
-        <el-form-item label="状态">
+        <el-form-item label="状态" prop="status">
           <el-select v-model="temp.status" class="filter-item" placeholder="请选择状态">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
+            <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -122,19 +125,29 @@
 </template>
 
 <script>
-import { userList, createUser, updateUser } from '@/api/user'
+import { userList, createUser, updateUser, deleteUser } from '@/api/user'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
+const statusOptions = [
+  { label: '激活', value: true, display_name: 'info' },
+  { label: '停用', value: false, display_name: 'info' }
+]
+
+const statusKeyValue = statusOptions.reduce((acc, cur) => {
+  acc[cur.label] = cur.display_name
+  return acc
+})
+
 const roleOptions = [
-  { key: 1, display_name: 'admin' },
-  { key: 2, display_name: 'editor' },
-  { key: 3, display_name: 'user' }
+  { key: 1, label: 'admin' },
+  { key: 2, label: 'editor' },
+  { key: 3, label: 'user' }
 ]
 
 // arr to obj, such as { 1 : "admin", 2 : "editor" }
 const roleKeyValue = roleOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
+  acc[cur.key] = cur.label
   return acc
 }, {})
 
@@ -144,11 +157,7 @@ export default {
   directives: { waves },
   filters: {
     statusFilter(status) {
-      const statusMap = {
-        激活: 'success',
-        停用: 'info'
-      }
-      return statusMap[status]
+      return statusKeyValue[status]
     },
     roleFilter(role) {
       return roleKeyValue[role]
@@ -166,20 +175,30 @@ export default {
         name: undefined,
         email: undefined,
         role: undefined,
-        status: undefined
+        status: undefined,
+        sort: undefined
       },
-      roleOptions: [1, 2, 3],
-      activeOptions: [
-        { display_name: '激活', value: true },
-        { display_name: '停用', value: false }
+      roleOptions: [
+        { key: 1, label: 'admin' },
+        { key: 2, label: 'editor' },
+        { key: 3, label: 'user' }
+      ],
+      statusOptions: [
+        { label: '激活', value: true, display_name: 'success' },
+        { label: '停用', value: false, display_name: 'info' }
+      ],
+      sortOptions: [
+        { label: '按ID升序排列', value: '+id' },
+        { label: '按ID降序排列', value: '-id' }
       ],
       showReviewer: false,
       temp: {
         id: undefined,
-        name: '',
-        email: '',
+        name: undefined,
+        email: undefined,
+        password: undefined,
         role: undefined,
-        status: ''
+        status: undefined
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -188,8 +207,9 @@ export default {
         create: '新建用户'
       },
       rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        email: [{ required: true, message: '请填写邮箱', trigger: 'blur' }],
+        role: [{ required: true, message: '请选择权限', trigger: 'blur' }],
+        status: [{ required: true, message: '请选择状态', trigger: 'blur' }]
       },
       downloadLoading: false
     }
@@ -245,10 +265,11 @@ export default {
     resetTemp() {
       this.temp = {
         id: undefined,
-        name: '',
+        name: undefined,
         email: '',
+        password: '',
         role: undefined,
-        status: ''
+        status: undefined
       }
     },
     handleCreate() {
@@ -262,11 +283,12 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
+          // this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
+          // this.temp.author = 'vue-element-admin'
           createUser(this.temp).then(() => {
-            this.list.unshift(this.temp)
+            // this.list.unshift(this.temp)
             this.dialogFormVisible = false
+            this.handleFilter()
             this.$notify({
               title: 'Success',
               message: 'Created Successfully',
@@ -293,6 +315,7 @@ export default {
             const index = this.list.findIndex(v => v.id === this.temp.id)
             this.list.splice(index, 1, this.temp)
             this.dialogFormVisible = false
+            this.handleFilter()
             this.$notify({
               title: 'Success',
               message: 'Update Successfully',
@@ -304,13 +327,16 @@ export default {
       })
     },
     handleDelete(row, index) {
-      this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
-        type: 'success',
-        duration: 2000
+      deleteUser(row.id).then(() => {
+        this.handleFilter()
+        this.$notify({
+          title: 'Success',
+          message: 'Delete Successfully',
+          type: 'success',
+          duration: 2000
+        })
+        // this.list.splice(index, 1)
       })
-      this.list.splice(index, 1)
     },
     handleDownload() {
       this.downloadLoading = true
