@@ -1,7 +1,12 @@
-# lrtest
+# lrtest-web
 
-### run command:
+### dev run command:
 
 ```
 npm run dev
+```
+### prod build command:
+
+```
+npm run build:prod
 ```

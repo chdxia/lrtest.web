@@ -24,7 +24,8 @@ module.exports = {
    * In most cases please use '/' !!!
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
-  publicPath: '/',
+  // 如果使用nginx代理，生产环境history模式下使用'./'路径
+  publicPath: process.env.NODE_ENV === 'production' ? '/' : './',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
@@ -39,7 +40,7 @@ module.exports = {
     // before: require('./mock/mock-server.js')
     proxy: {
       [process.env.VUE_APP_BASE_API]: {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8082',
         changeOrigin: true,
         pathRewrite: {
           ['^' + process.env.VUE_APP_BASE_API]: '/api/v1'

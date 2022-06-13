@@ -97,7 +97,7 @@ export default {
     }
     return {
       loginForm: {
-        username: 'chdxia@gmail.com',
+        username: 'chdxiamail@gmail.com',
         password: '123456'
       },
       loginRules: {
