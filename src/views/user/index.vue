@@ -78,7 +78,7 @@
           <el-button v-if="row.status" size="mini" @click="handleModifyStatus(row,false)">
             停用
           </el-button>
-          <el-button type="danger" size="mini" @click="handleDelete(row)">
+          <el-button type="danger" size="mini" @click="handleDelete(row, index)">
             删除
           </el-button>
         </template>
@@ -245,9 +245,6 @@ export default {
       row.status = status
       const tempData = Object.assign({}, row)
       updateUser(tempData).then(() => {
-        const index = this.list.findIndex(v => v.id === this.temp.id)
-        this.list.splice(index, 1, this.temp)
-        this.handleFilter()
         this.$message({
           message: '操作成功',
           type: 'success'
@@ -301,14 +298,18 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          createUser(this.temp).then(() => {
-            this.dialogFormVisible = false
-            this.handleFilter()
-            this.$notify({
-              title: '成功',
-              message: '成功添加用户信息',
-              type: 'success',
-              duration: 2000
+          createUser(this.temp).then(() => { // 发送请求,创建用户
+            this.dialogFormVisible = false // 关闭新建窗口
+            const listQuery = Object.assign({}, { email: this.temp.email })
+            userList(listQuery).then(response => { // 根据邮箱查询用户
+              const user = response.data.users[0] // 将刚刚新增的用户信息取出来（包括创建时间、修改时间）
+              this.list.unshift(user) // 展示新增的用户信息,这里直接使用this.list.unshift(this.temp)无法显示创建时间以及修改时间
+              this.$notify({
+                title: '成功',
+                message: '成功添加用户信息',
+                type: 'success',
+                duration: 2000
+              })
             })
           })
         }
@@ -326,12 +327,10 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          updateUser(tempData).then(() => {
+          updateUser(this.temp).then(() => {
+            this.dialogFormVisible = false
             const index = this.list.findIndex(v => v.id === this.temp.id)
             this.list.splice(index, 1, this.temp)
-            this.dialogFormVisible = false
-            this.handleFilter()
             this.$notify({
               title: '成功',
               message: '成功修改用户信息',
@@ -342,9 +341,9 @@ export default {
         }
       })
     },
-    handleDelete(row) {
+    handleDelete(row, index) {
       deleteUser(row.id).then(() => {
-        this.handleFilter()
+        this.list.splice(index, 1)
         this.$notify({
           title: '成功',
           message: '成功删除用户信息',
