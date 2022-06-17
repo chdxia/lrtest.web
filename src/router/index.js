@@ -9,7 +9,7 @@ import Layout from '@/layout'
 /* Router Modules */
 // import componentsRouter from './modules/components'
 // import chartsRouter from './modules/charts'
-import tableRouter from './modules/table'
+// import tableRouter from './modules/table'
 // import nestedRouter from './modules/nested'
 
 /**
@@ -73,13 +73,13 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/home',
     children: [
       {
-        path: 'dashboard',
-        component: () => import('@/views/dashboard/index'),
-        name: 'Dashboard',
-        meta: { title: '仪表盘', icon: 'dashboard', affix: true }
+        path: 'home',
+        component: () => import('@/views/home/index'),
+        name: 'Home',
+        meta: { title: '主页', icon: 'home', affix: true }
       }
     ]
   },
@@ -111,7 +111,19 @@ export const asyncRoutes = [
         path: '',
         component: () => import('@/views/user/index'),
         name: 'UserTable',
-        meta: { title: '用户', icon: 'user' }
+        meta: { title: '用户管理', icon: 'user' }
+      }
+    ]
+  },
+  {
+    path: '/task',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/task/index'),
+        name: 'TaskTable',
+        meta: { title: '任务管理', icon: 'list' }
       }
     ]
   },
@@ -122,13 +134,25 @@ export const asyncRoutes = [
       {
         path: '',
         component: () => import('@/views/item/index'),
-        name: 'UserTable',
-        meta: { title: '物品', icon: 'list' }
+        name: 'ItemTable',
+        meta: { title: '物品管理', icon: 'shopping' }
+      }
+    ]
+  },
+  {
+    path: '/qiniu',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/qiniu/index'),
+        name: 'QiNiu',
+        meta: { title: '七牛图床', icon: 'picture' }
       }
     ]
   },
   /** when your routing map is too long, you can split it into small modules **/
-  tableRouter,
+  // tableRouter,
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
