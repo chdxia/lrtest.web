@@ -26,7 +26,7 @@ export default {
     }
   },
   methods: {
-    beforeUpload(file) {
+    beforeUpload() {
       // 定义文件名
       // this.qiniuData.key = `upload_pic_${new Date().getTime()}_${file.name}`
       // 已修改，不再使用自定义文件名，转而使用七牛默认的etag作为文件名
@@ -60,6 +60,7 @@ export default {
           console.log(result)
         },
         error: errResult => {
+          console.log('哈哈哈哈哈哈哈哈哈哈')
           console.log(errResult)
           this.$message({
             message: '上传失败',
@@ -67,7 +68,7 @@ export default {
           })
         },
         complete: result => {
-          console.log(result)
+          console.log(result.data.key)
           this.$message({
             message: '上传成功',
             type: 'success'
