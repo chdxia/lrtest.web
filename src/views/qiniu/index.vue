@@ -1,29 +1,48 @@
 <template>
-  <el-upload
-    :action="uploadUrl"
-    :http-request="uploadFile"
-    :before-upload="beforeUpload"
-    accept=".jpeg, .jpg, .png"
-    drag
-  >
-    <i class="el-icon-upload" />
-    <div class="el-upload__text">
-      将图片拖到此处，或<em>点击上传</em>
+  <div class="image-container">
+    <div class="image-upload">
+      <el-upload
+        :action="uploadUrl"
+        :http-request="uploadFile"
+        :before-upload="beforeUpload"
+        accept=".jpeg, .jpg, .png"
+        drag
+      >
+        <i class="el-icon-upload" />
+        <div class="el-upload__text">
+          将图片拖到此处，或<em>点击上传</em>
+        </div>
+      </el-upload>
     </div>
-  </el-upload>
+    <div v-loading="listLoading" class="image-list">
+      <el-image
+        v-for="src in srcList"
+        :key="src"
+        :src="src.url"
+        :preview-src-list="srcList"
+        style="width: 100px; height: 100px"
+        lazy
+      />
+    </div>
+  </div>
 </template>
 
 <script>
 import * as qiniu from 'qiniu-js'
-import { getToken } from '@/api/qiniu'
+import { getToken, fileList } from '@/api/qiniu'
 
 export default {
   data() {
     return {
       uploadUrl: 'https://upload-z2.qiniup.com',
       key: '',
-      qiniuToken: ''
+      qiniuToken: '',
+      listLoading: true,
+      srcList: null
     }
+  },
+  created() {
+    this.getList()
   },
   methods: {
     beforeUpload() {
@@ -60,7 +79,6 @@ export default {
           console.log(result)
         },
         error: errResult => {
-          console.log('哈哈哈哈哈哈哈哈哈哈')
           console.log(errResult)
           this.$message({
             message: '上传失败',
@@ -68,12 +86,21 @@ export default {
           })
         },
         complete: result => {
-          console.log(result.data.key)
+          this.getList()
           this.$message({
             message: '上传成功',
             type: 'success'
           })
         }
+      })
+    },
+    getList() {
+      this.listLoading = true
+      fileList().then(response => {
+        this.srcList = response.data
+        setTimeout(() => {
+          this.listLoading = false
+        }, 0.3 * 1000)
       })
     }
   }

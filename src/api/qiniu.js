@@ -7,3 +7,10 @@ export function getToken(key) {
     params: { key }
   })
 }
+
+export function fileList() {
+  return request({
+    url: '/qiniu/files',
+    method: 'get'
+  })
+}
