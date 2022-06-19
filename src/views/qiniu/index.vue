@@ -1,39 +1,72 @@
 <template>
-  <el-upload :data="dataObj" :multiple="true" :before-upload="beforeUpload" action="https://upload.qbox.me" drag>
+  <el-upload
+    :action="uploadUrl"
+    :http-request="upQiniu"
+    :before-upload="beforeUpload"
+    accept=".jpeg, .jpg, .png"
+    drag
+  >
     <i class="el-icon-upload" />
     <div class="el-upload__text">
-      将文件拖到此处，或<em>点击上传</em>
+      将图片拖到此处，或<em>点击上传</em>
     </div>
   </el-upload>
 </template>
 
 <script>
+import * as qiniu from 'qiniu-js'
 import { getToken } from '@/api/qiniu'
-// 获取七牛token 后端通过Access Key,Secret Key,bucket等生成token
-// 七牛官方sdk https://developer.qiniu.com/sdk#official-sdk
 
 export default {
   data() {
     return {
-      dataObj: { token: '', key: '' },
-      image_uri: [],
-      fileList: []
+      uploadUrl: 'https://upload-z2.qiniup.com',
+      qiniuData: {
+        key: '', // 图片名字处理
+        token: '', // 七牛云token
+        data: {},
+        bucket: ''
+      }
     }
   },
   methods: {
-    beforeUpload() {
+    beforeUpload(file) {
+      // 定义文件名
+      this.qiniuData.key = `upload_pic_${new Date().getTime()}_${file.name}`
+      // 从服务器获取token
       const _self = this
       return new Promise((resolve, reject) => {
-        getToken().then(response => {
-          const key = response.data.qiniu_key
-          const token = response.data.qiniu_token
-          _self._data.dataObj.token = token
-          _self._data.dataObj.key = key
-          resolve(true)
+        getToken(this.qiniuData.key).then(response => {
+          _self.qiniuData.token = response.data.token
+          resolve(_self.qiniuData)
         }).catch(err => {
           console.log(err)
           reject(false)
         })
+      })
+    },
+    upQiniu(e) {
+      var file = e.file
+      const putExtra = {
+        fname: this.qiniuData.key,
+        params: {},
+        mimeType: null
+      }
+      const config = {
+        useCdnDomain: true,
+        region: qiniu.region.z2
+      }
+      const observable = qiniu.upload(file, this.qiniuData.key, this.qiniuData.token, putExtra, config)
+      observable.subscribe({
+        next: result => {
+          console.log(result)
+        },
+        error: errResult => {
+          console.log(errResult)
+        },
+        complete: result => {
+          console.log(result)
+        }
       })
     }
   }
