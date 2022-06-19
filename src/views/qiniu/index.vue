@@ -18,10 +18,11 @@
       <el-image
         v-for="src in srcList"
         :key="src"
-        :src="src.url"
+        :src="src"
+        :alt="src"
+        :lazy="true"
         :preview-src-list="srcList"
         style="width: 100px; height: 100px"
-        lazy
       />
     </div>
   </div>
