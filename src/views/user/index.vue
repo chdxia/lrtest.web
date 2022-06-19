@@ -223,7 +223,6 @@ export default {
           this.listQuery[i] = undefined
         }
       }
-      console.log(this.listQuery)
       userList(this.listQuery).then(response => {
         this.list = response.data.users
         this.total = response.data.total

@@ -1,7 +1,7 @@
 <template>
   <el-upload
     :action="uploadUrl"
-    :http-request="upQiniu"
+    :http-request="uploadFile"
     :before-upload="beforeUpload"
     accept=".jpeg, .jpg, .png"
     drag
@@ -21,34 +21,31 @@ export default {
   data() {
     return {
       uploadUrl: 'https://upload-z2.qiniup.com',
-      qiniuData: {
-        key: '', // 图片名字处理
-        token: '', // 七牛云token
-        data: {},
-        bucket: ''
-      }
+      key: '',
+      qiniuToken: ''
     }
   },
   methods: {
     beforeUpload(file) {
       // 定义文件名
-      this.qiniuData.key = `upload_pic_${new Date().getTime()}_${file.name}`
-      // 从服务器获取token
-      const _self = this
+      // this.qiniuData.key = `upload_pic_${new Date().getTime()}_${file.name}`
+      // 已修改，不再使用自定义文件名，转而使用七牛默认的etag作为文件名
+      // 当文件hash值相同时，文件名也相同，外链地址也相同，七牛云自带文件去重的同时，也能满足文件名、外链去重
       return new Promise((resolve, reject) => {
-        getToken(this.qiniuData.key).then(response => {
-          _self.qiniuData.token = response.data.token
-          resolve(_self.qiniuData)
+        // 从服务器获取token，修改后，获取token中不再包含key值
+        getToken().then(response => {
+          this.qiniuToken = response.data.token
+          resolve(true)
         }).catch(err => {
           console.log(err)
           reject(false)
         })
       })
     },
-    upQiniu(event) {
-      var file = event.file
+    uploadFile(event) {
+      const file = event.file
       const putExtra = {
-        fname: this.qiniuData.key,
+        fname: file.name,
         params: {},
         mimeType: null
       }
@@ -56,7 +53,8 @@ export default {
         useCdnDomain: true,
         region: qiniu.region.z2
       }
-      const observable = qiniu.upload(file, this.qiniuData.key, this.qiniuData.token, putExtra, config)
+      // key值为null
+      const observable = qiniu.upload(file, null, this.qiniuToken, putExtra, config)
       observable.subscribe({
         next: result => {
           console.log(result)
