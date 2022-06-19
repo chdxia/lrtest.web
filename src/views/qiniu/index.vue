@@ -5,8 +5,10 @@
         :action="uploadUrl"
         :http-request="uploadFile"
         :before-upload="beforeUpload"
-        accept=".jpeg, .jpg, .png"
-        drag
+        :show-file-list="false"
+        :drag="true"
+        :multiple="true"
+        accept=".jpeg, .jpg, .png, .gif, .svg"
       >
         <i class="el-icon-upload" />
         <div class="el-upload__text">
