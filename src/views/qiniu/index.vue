@@ -45,8 +45,8 @@ export default {
         })
       })
     },
-    upQiniu(e) {
-      var file = e.file
+    upQiniu(event) {
+      var file = event.file
       const putExtra = {
         fname: this.qiniuData.key,
         params: {},
@@ -63,9 +63,17 @@ export default {
         },
         error: errResult => {
           console.log(errResult)
+          this.$message({
+            message: '上传失败',
+            type: 'error'
+          })
         },
         complete: result => {
           console.log(result)
+          this.$message({
+            message: '上传成功',
+            type: 'success'
+          })
         }
       })
     }
