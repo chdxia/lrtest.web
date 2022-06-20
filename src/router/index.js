@@ -82,20 +82,6 @@ export const constantRoutes = [
         meta: { title: '主页', icon: 'home', affix: true }
       }
     ]
-  },
-  {
-    path: '/profile',
-    component: Layout,
-    redirect: '/profile/index',
-    hidden: true,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/profile/index'),
-        name: 'Profile',
-        meta: { title: '简介', icon: 'user', noCache: true }
-      }
-    ]
   }
 ]
 /**
@@ -103,6 +89,19 @@ export const constantRoutes = [
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
+  {
+    path: '/profile',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/profile/index'),
+        name: 'Profile',
+        meta: { title: '简介', icon: 'user', noCache: true }
+      }
+    ]
+  },
   {
     path: '/user',
     component: Layout,

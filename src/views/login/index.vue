@@ -44,22 +44,9 @@
           </span>
         </el-form-item>
       </el-tooltip>
-
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
-
-      <div style="position:relative">
-        <div class="tips">
-          <span>Username : admin</span>
-          <span>Password : any</span>
-        </div>
-        <div class="tips">
-          <span style="margin-right:18px;">Username : editor</span>
-          <span>Password : any</span>
-        </div>
-
-        <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
-          Or connect with
-        </el-button>
+      <div>
+        <el-button size="mini" @click.native.prevent="visitorLogin">访客登录</el-button>
       </div>
     </el-form>
 
@@ -97,8 +84,8 @@ export default {
     }
     return {
       loginForm: {
-        username: 'chdxiamail@gmail.com',
-        password: '123456'
+        username: '',
+        password: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -138,6 +125,11 @@ export default {
     // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
+    visitorLogin() {
+      this.loginForm.username = 'chdxiamail@gmail.com'
+      this.loginForm.password = '123456'
+      this.handleLogin()
+    },
     checkCapslock(e) {
       const { key } = e
       this.capsTooltip = key && key.length === 1 && (key >= 'A' && key <= 'Z')
@@ -307,12 +299,6 @@ $light_gray:#eee;
     color: $dark_gray;
     cursor: pointer;
     user-select: none;
-  }
-
-  .thirdparty-button {
-    position: absolute;
-    right: 0;
-    bottom: 6px;
   }
 
   @media only screen and (max-width: 470px) {
