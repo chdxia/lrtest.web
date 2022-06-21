@@ -1,25 +1,19 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.name" placeholder="姓名" style="width: 100px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.email" placeholder="邮箱" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.name" placeholder="姓名" style="width: 90px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.email" placeholder="邮箱" style="width: 180px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.role" placeholder="权限" clearable class="filter-item" style="width: 90px">
-        <el-option v-for="item in roleOptions" :key="item" :label="item | roleFilter" :value="item" />
+        <el-option v-for="item in roleOptions" :key="item.key" :label="item.label" :value="item.key" />
       </el-select>
       <el-select v-model="listQuery.status" placeholder="状态" clearable class="filter-item" style="width: 90px">
-        <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
-      </el-select>
-      <el-select v-model="listQuery.sort" style="width: 130px" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
+        <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
       <el-button v-waves class="filter-item" style="margin-left: 10px" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加
-      </el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
-        导出
       </el-button>
     </div>
 
@@ -33,12 +27,12 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
-        <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
+      <el-table-column label="序号" align="center" width="60px">
+        <template slot-scope="{$index}">
+          <span>{{ (listQuery.page-1)*listQuery.limit + $index + 1 }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="姓名" width="110px" align="center">
+      <el-table-column label="姓名" width="90px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
         </template>
@@ -53,35 +47,35 @@
           <span>{{ row.role | roleFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" class-name="status-col" width="100">
+      <el-table-column label="状态" class-name="status-col" width="90">
         <template slot-scope="{row}">
           <el-tag :type="getStatus(row.status) | statusFilter">
             {{ getStatus(row.status) }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" width="160px" align="center">
+      <el-table-column label="创建时间" prop="create_time" sortable="custom" width="160px" align="center" :class-name="getSortClass('create_time')">
         <template slot-scope="{row}">
           <span>{{ row.create_time }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="修改时间" width="160px" align="center">
+      <el-table-column label="修改时间" prop="update_time" sortable="custom" width="160px" align="center" :class-name="getSortClass('update_time')">
         <template slot-scope="{row}">
           <span>{{ row.update_time }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
-        <template slot-scope="{row,$index}">
+        <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             修改
           </el-button>
-          <el-button v-if="!row.is_active" size="mini" type="success" @click="handleModifyStatus(row,'published')">
+          <el-button v-if="!row.status" size="mini" type="success" @click="handleModifyStatus(row,true)">
             激活
           </el-button>
-          <el-button v-if="row.is_active" size="mini" @click="handleModifyStatus(row,'draft')">
+          <el-button v-if="row.status" size="mini" @click="handleModifyStatus(row,false)">
             停用
           </el-button>
-          <el-button v-if="row.status!=2" size="mini" type="danger" @click="handleDelete(row,$index)">
+          <el-button type="danger" size="mini" @click="handleDelete(row, index)">
             删除
           </el-button>
         </template>
@@ -98,14 +92,17 @@
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="temp.email" />
         </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="temp.password" />
+        </el-form-item>
         <el-form-item label="权限" prop="role">
           <el-select v-model="temp.role" class="filter-item" placeholder="请选择权限">
-            <el-option v-for="item in roleOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+            <el-option v-for="item in roleOptions" :key="item.key" :label="item.label" :value="item.key" />
           </el-select>
         </el-form-item>
-        <el-form-item label="状态">
+        <el-form-item label="状态" prop="status">
           <el-select v-model="temp.status" class="filter-item" placeholder="请选择状态">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
+            <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -122,19 +119,29 @@
 </template>
 
 <script>
-import { userList, createUser, updateUser } from '@/api/user'
+import { userList, createUser, updateUser, deleteUser } from '@/api/user'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
+const statusOptions = [
+  { label: '激活', value: true, display_name: 'success' },
+  { label: '停用', value: false, display_name: 'info' }
+]
+
+const statusKeyValue = statusOptions.reduce((acc, cur) => {
+  acc[cur.label] = cur.display_name
+  return acc
+}, {})
+
 const roleOptions = [
-  { key: 1, display_name: 'admin' },
-  { key: 2, display_name: 'editor' },
-  { key: 3, display_name: 'user' }
+  { key: 1, label: 'admin' },
+  { key: 2, label: 'editor' },
+  { key: 3, label: 'user' }
 ]
 
 // arr to obj, such as { 1 : "admin", 2 : "editor" }
 const roleKeyValue = roleOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
+  acc[cur.key] = cur.label
   return acc
 }, {})
 
@@ -144,11 +151,7 @@ export default {
   directives: { waves },
   filters: {
     statusFilter(status) {
-      const statusMap = {
-        激活: 'success',
-        停用: 'info'
-      }
-      return statusMap[status]
+      return statusKeyValue[status]
     },
     roleFilter(role) {
       return roleKeyValue[role]
@@ -166,20 +169,26 @@ export default {
         name: undefined,
         email: undefined,
         role: undefined,
-        status: undefined
+        status: undefined,
+        sort: undefined
       },
-      roleOptions: [1, 2, 3],
-      activeOptions: [
-        { display_name: '激活', value: true },
-        { display_name: '停用', value: false }
+      roleOptions: [
+        { key: 1, label: 'admin' },
+        { key: 2, label: 'editor' },
+        { key: 3, label: 'user' }
+      ],
+      statusOptions: [
+        { label: '激活', value: true, display_name: 'success' },
+        { label: '停用', value: false, display_name: 'info' }
       ],
       showReviewer: false,
       temp: {
         id: undefined,
-        name: '',
-        email: '',
+        name: undefined,
+        email: undefined,
+        password: undefined,
         role: undefined,
-        status: ''
+        status: undefined
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -188,8 +197,10 @@ export default {
         create: '新建用户'
       },
       rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        email: [{ required: true, message: '请填写邮箱', trigger: 'change' }],
+        password: [{ required: true, message: '请填写密码', trigger: 'blur' }],
+        role: [{ required: true, message: '请选择权限', trigger: 'blur' }],
+        status: [{ required: true, message: '请选择状态', trigger: 'blur' }]
       },
       downloadLoading: false
     }
@@ -207,14 +218,19 @@ export default {
     },
     getList() {
       this.listLoading = true
+      for (const i in this.listQuery) {
+        if (this.listQuery[i] === '') {
+          this.listQuery[i] = undefined
+        }
+      }
       userList(this.listQuery).then(response => {
-        this.list = response.data
-        this.total = 100
+        this.list = response.data.users
+        this.total = response.data.total
 
-        // Just to simulate the time of the request
+        // 模拟请求的时间，request请求成功之前，会一直转圈
         setTimeout(() => {
           this.listLoading = false
-        }, 1.5 * 1000)
+        }, 0.3 * 1000)
       })
     },
     handleFilter() {
@@ -222,38 +238,54 @@ export default {
       this.getList()
     },
     handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
       row.status = status
+      const tempData = Object.assign({}, row)
+      updateUser(tempData).then(() => {
+        this.$message({
+          message: '操作成功',
+          type: 'success'
+        })
+      })
     },
     sortChange(data) {
       const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
+      if (prop === 'create_time') {
+        this.sortByCreateTime(order)
+      }
+      if (prop === 'update_time') {
+        this.sortByUpdateTime(order)
       }
     },
-    sortByID(order) {
+    sortByCreateTime(order) {
       if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+        this.listQuery.sort = '+create_time'
       } else {
-        this.listQuery.sort = '-id'
+        this.listQuery.sort = '-create_time'
+      }
+      this.handleFilter()
+    },
+    sortByUpdateTime(order) {
+      if (order === 'ascending') {
+        this.listQuery.sort = '+update_time'
+      } else {
+        this.listQuery.sort = '-update_time'
       }
       this.handleFilter()
     },
     resetTemp() {
       this.temp = {
         id: undefined,
-        name: '',
-        email: '',
+        name: undefined,
+        email: undefined,
+        password: undefined,
         role: undefined,
-        status: ''
+        status: true
       }
     },
     handleCreate() {
       this.resetTemp()
       this.dialogStatus = 'create'
+      this.rules.password[0].required = true
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
@@ -262,16 +294,18 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createUser(this.temp).then(() => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: 'Created Successfully',
-              type: 'success',
-              duration: 2000
+          createUser(this.temp).then(() => { // 发送请求,创建用户
+            this.dialogFormVisible = false // 关闭新建窗口
+            const listQuery = Object.assign({}, { email: this.temp.email })
+            userList(listQuery).then(response => { // 根据邮箱查询用户
+              const user = response.data.users[0] // 将刚刚新增的用户信息取出来（包括创建时间、修改时间）
+              this.list.unshift(user) // 展示新增的用户信息,这里直接使用this.list.unshift(this.temp)无法显示创建时间以及修改时间
+              this.$notify({
+                title: '成功',
+                message: '成功添加用户信息',
+                type: 'success',
+                duration: 2000
+              })
             })
           })
         }
@@ -280,6 +314,7 @@ export default {
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
+      this.rules.password[0].required = false
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
@@ -288,14 +323,13 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          updateUser(tempData).then(() => {
+          updateUser(this.temp).then(() => {
+            this.dialogFormVisible = false
             const index = this.list.findIndex(v => v.id === this.temp.id)
             this.list.splice(index, 1, this.temp)
-            this.dialogFormVisible = false
             this.$notify({
-              title: 'Success',
-              message: 'Update Successfully',
+              title: '成功',
+              message: '成功修改用户信息',
               type: 'success',
               duration: 2000
             })
@@ -304,26 +338,14 @@ export default {
       })
     },
     handleDelete(row, index) {
-      this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
-        type: 'success',
-        duration: 2000
-      })
-      this.list.splice(index, 1)
-    },
-    handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
-        const filterVal = ['timestamp', 'title', 'type', 'importance', 'status']
-        const data = this.formatJson(filterVal)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'table-list'
+      deleteUser(row.id).then(() => {
+        this.list.splice(index, 1)
+        this.$notify({
+          title: '成功',
+          message: '成功删除用户信息',
+          type: 'success',
+          duration: 2000
         })
-        this.downloadLoading = false
       })
     },
     getSortClass: function(key) {

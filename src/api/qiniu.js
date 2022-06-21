@@ -1,8 +1,16 @@
 import request from '@/utils/request'
 
-export function getToken() {
+export function getToken(key) {
   return request({
-    url: '/qiniu/upload/token', // 假地址 自行替换
+    url: '/qiniu/upload/token',
+    method: 'get',
+    params: { key }
+  })
+}
+
+export function fileList() {
+  return request({
+    url: '/qiniu/files',
     method: 'get'
   })
 }

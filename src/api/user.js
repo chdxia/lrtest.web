@@ -19,7 +19,7 @@ export function getInfo(token) {
 export function logout() {
   return request({
     url: '/logout',
-    method: 'post'
+    method: 'delete'
   })
 }
 
@@ -31,25 +31,9 @@ export function userList(query) {
   })
 }
 
-export function fetchArticle(id) {
-  return request({
-    url: '/vue-element-admin/article/detail',
-    method: 'get',
-    params: { id }
-  })
-}
-
-export function fetchPv(pv) {
-  return request({
-    url: '/vue-element-admin/article/pv',
-    method: 'get',
-    params: { pv }
-  })
-}
-
 export function createUser(data) {
   return request({
-    url: '/vue-element-admin/article/create',
+    url: '/users',
     method: 'post',
     data
   })
@@ -57,8 +41,15 @@ export function createUser(data) {
 
 export function updateUser(data) {
   return request({
-    url: '/vue-element-admin/article/update',
-    method: 'post',
+    url: `/users/${data.id}`,
+    method: 'put',
     data
+  })
+}
+
+export function deleteUser(user_id) {
+  return request({
+    url: `/users/${user_id}`,
+    method: 'delete'
   })
 }
