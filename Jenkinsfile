@@ -17,7 +17,7 @@ pipeline {
     }
     stage('构建') {
       steps {
-        bash -cx 'rm -rf ./dist && npm install && npm run build:prod'
+        sh 'rm -rf ./dist && npm install && npm run build:prod'
       }
     }
     stage('远程部署') {
