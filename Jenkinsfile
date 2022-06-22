@@ -18,9 +18,7 @@ pipeline {
     stage('构建') {
       steps {
         script {
-          sh "rm -rf ./dist
-          && npm install
-          && npm run build:prod"
+          bash -cx "rm -rf ./dist && npm install && npm run build:prod"
         }
       }
     }
