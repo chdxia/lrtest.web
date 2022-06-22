@@ -15,7 +15,7 @@ pipeline {
         sshCommand remote: server, command: 'rm -rf /usr/share/nginx/lrtest-web/dist'
       }
     }
-    stage('构建') {
+    stage('本地构建') {
       steps {
         sh 'rm -rf ./dist && npm install && npm run build:prod'
       }
