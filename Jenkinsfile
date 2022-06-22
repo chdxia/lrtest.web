@@ -18,9 +18,7 @@ pipeline {
     stage('构建') {
       steps {
         script {
-          rm -rf ./dist
-          npm install
-          npm run build:prod
+          echo "hello word"
         }
       }
     }
