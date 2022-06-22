@@ -12,21 +12,23 @@ pipeline {
         script {
           server = getServer()
         }
-        sshCommand remote: server, command: "rm -rf /usr/share/nginx/lrtest-web/dist"
+        script {
+          echo 'hello word'
+        }
       }
     }
     stage('构建') {
       steps {
         script {
-          rm -rf ./dist
-          && npm install
-          && npm run build:prod
+          echo 'hello word'
         }
       }
     }
     stage('远程部署') {
       steps {
-        sshPut remote: server, from: '/var/jenkins_home/workspace/lrtest-web/dist', into: '/usr/share/nginx/lrtest-web'
+        script {
+          echo 'hello word'
+        }
       }
     }
   }
