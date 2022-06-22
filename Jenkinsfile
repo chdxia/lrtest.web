@@ -22,7 +22,7 @@ pipeline {
     }
     stage('远程部署') {
       steps {
-        sh 'node --version'
+        sshPut remote: server, from: "dist", into: "/usr/share/nginx/lrtest-web"
       }
     }
   }
