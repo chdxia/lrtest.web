@@ -19,16 +19,14 @@ pipeline {
       steps {
         script {
           rm -rf ./dist
-          npm install
-          npm run build:prod
+          && npm install
+          && npm run build:prod
         }
       }
     }
     stage('远程部署') {
       steps {
-        script {
-          echo 'hello word'
-        }
+        sshPut remote: server, from: '/var/jenkins_home/workspace/lrtest-web/dist', into: '/usr/share/nginx/lrtest-web'
       }
     }
   }
