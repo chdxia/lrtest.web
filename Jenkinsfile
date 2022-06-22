@@ -26,7 +26,9 @@ pipeline {
     }
     stage('远程部署') {
       steps {
-        sshPut remote: server, from: "dist", into: "/usr/share/nginx/lrtest-web"
+        script {
+          echo "hello word"
+        }
       }
     }
   }
