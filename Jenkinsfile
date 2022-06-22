@@ -12,21 +12,17 @@ pipeline {
         script {
           server = getServer()
         }
-        sshCommand remote: server, command: "rm -rf /usr/share/nginx/lrtest-web/dist"
+        sshCommand remote: server, command: 'rm -rf /usr/share/nginx/lrtest-web/dist'
       }
     }
     stage('构建') {
       steps {
-        script {
-          bash -cx "rm -rf ./dist && npm install && npm run build:prod"
-        }
+        bash -cx 'rm -rf ./dist && npm install && npm run build:prod'
       }
     }
     stage('远程部署') {
       steps {
-        script {
-          echo "hello word"
-        }
+        sh 'node --version'
       }
     }
   }
@@ -41,9 +37,9 @@ def getServer() {
     remote.allowAnyHosts = true
 
     withCredentials([usernamePassword(
-        credentialsId: 'a477bfd8-880b-4d82-ae37-eecaa6e0133d',
-        usernameVariable: 'username',
-        passwordVariable: 'password'
+        credentialsId: "a477bfd8-880b-4d82-ae37-eecaa6e0133d",
+        usernameVariable: "username",
+        passwordVariable: "password"
     )]) {
         remote.user = "${username}"
         remote.password = "${password}"
