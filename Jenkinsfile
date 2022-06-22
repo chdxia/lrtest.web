@@ -26,7 +26,7 @@ pipeline {
     }
     stage('远程部署') {
       steps {
-        sshPut remote: server, from: 'dist', into: '/root/lrtest-web'
+        sshPut remote: server, from: '/var/jenkins_home/workspace/lrtest-web', into: '/root'
       }
     }
   }
