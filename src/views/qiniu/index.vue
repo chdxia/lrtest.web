@@ -22,6 +22,7 @@
         :key="src"
         :src="src"
         :alt="src"
+        fit="contain"
         :lazy="true"
         :preview-src-list="srcList"
         style="width: 100px; height: 100px"
