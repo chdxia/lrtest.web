@@ -16,17 +16,21 @@
         </div>
       </el-upload>
     </div>
+    <div class="delete">
+      <el-button type="danger">批量删除</el-button>
+    </div>
     <div v-loading="listLoading" class="image-list">
-      <el-image
-        v-for="src in srcList"
-        :key="src"
-        :src="src"
-        :alt="src"
-        fit="contain"
-        :lazy="true"
-        :preview-src-list="srcList"
-        style="width: 100px; height: 100px"
-      />
+      <span v-for="src in srcList" :key="src" v-loading="listLoading" class="image-button">
+        <el-image
+          :src="src"
+          :alt="src"
+          :lazy="true"
+          :preview-src-list="srcList"
+          fit="cover"
+          class="image"
+        />
+        <el-checkbox v-model="checked" />
+      </span>
     </div>
   </div>
 </template>
@@ -36,6 +40,7 @@ import * as qiniu from 'qiniu-js'
 import { getToken, fileList } from '@/api/qiniu'
 
 export default {
+  name: 'Qiniu',
   data() {
     return {
       uploadUrl: 'https://upload-z2.qiniup.com',
@@ -110,3 +115,17 @@ export default {
   }
 }
 </script>
+
+<style>
+.image-button {
+  width: 200px;
+  height: 200px;
+}
+
+.image {
+  width: 100px;
+  height: 100px;
+  margin-left: 20px;
+  margin-bottom: 20px
+}
+</style>
