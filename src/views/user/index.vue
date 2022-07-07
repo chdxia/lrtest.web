@@ -3,7 +3,7 @@
     <div class="filter-container">
       <el-input v-model="listQuery.name" placeholder="姓名" style="width: 90px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-input v-model="listQuery.email" placeholder="邮箱" style="width: 180px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.role" placeholder="权限" clearable class="filter-item" style="width: 90px">
+      <el-select v-model="listQuery.role_id" placeholder="角色" clearable class="filter-item" style="width: 90px">
         <el-option v-for="item in roleOptions" :key="item.key" :label="item.label" :value="item.key" />
       </el-select>
       <el-select v-model="listQuery.status" placeholder="状态" clearable class="filter-item" style="width: 90px">
@@ -42,9 +42,9 @@
           <span>{{ row.email }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="权限" width="90px" align="center">
+      <el-table-column label="角色" width="90px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.role | roleFilter }}</span>
+          <span>{{ row.role_id | roleFilter }}</span>
         </template>
       </el-table-column>
       <el-table-column label="状态" class-name="status-col" width="90">
@@ -95,7 +95,7 @@
         <el-form-item label="密码" prop="password">
           <el-input v-model="temp.password" />
         </el-form-item>
-        <el-form-item label="权限" prop="role">
+        <el-form-item label="角色" prop="role_id">
           <el-select v-model="temp.role" class="filter-item" placeholder="请选择权限">
             <el-option v-for="item in roleOptions" :key="item.key" :label="item.label" :value="item.key" />
           </el-select>
@@ -135,8 +135,9 @@ const statusKeyValue = statusOptions.reduce((acc, cur) => {
 
 const roleOptions = [
   { key: 1, label: 'admin' },
-  { key: 2, label: 'editor' },
-  { key: 3, label: 'user' }
+  { key: 2, label: 'pm' },
+  { key: 3, label: 'developer' },
+  { key: 4, label: 'tester' }
 ]
 
 // arr to obj, such as { 1 : "admin", 2 : "editor" }
@@ -168,14 +169,15 @@ export default {
         limit: 10,
         name: undefined,
         email: undefined,
-        role: undefined,
+        role_id: undefined,
         status: undefined,
         sort: undefined
       },
       roleOptions: [
         { key: 1, label: 'admin' },
-        { key: 2, label: 'editor' },
-        { key: 3, label: 'user' }
+        { key: 2, label: 'pm' },
+        { key: 3, label: 'developer' },
+        { key: 4, label: 'tester' }
       ],
       statusOptions: [
         { label: '激活', value: true, display_name: 'success' },
@@ -187,7 +189,7 @@ export default {
         name: undefined,
         email: undefined,
         password: undefined,
-        role: undefined,
+        role_id: undefined,
         status: undefined
       },
       dialogFormVisible: false,
@@ -278,7 +280,7 @@ export default {
         name: undefined,
         email: undefined,
         password: undefined,
-        role: undefined,
+        role_id: undefined,
         status: true
       }
     },

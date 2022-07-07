@@ -128,18 +128,6 @@ export const asyncRoutes = [
     ]
   },
   {
-    path: '/item',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        component: () => import('@/views/item/index'),
-        name: 'ItemTable',
-        meta: { title: '物品管理', icon: 'shopping' }
-      }
-    ]
-  },
-  {
     path: '/qiniu',
     component: Layout,
     children: [
