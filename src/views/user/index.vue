@@ -212,9 +212,10 @@ export default {
         create: '新建用户'
       },
       rules: {
-        email: [{ required: true, message: '请填写邮箱', trigger: 'change' }],
+        account: [{ required: true, message: '请填写账号', trigger: 'blur' }],
+        email: [{ required: true, message: '请填写邮箱', trigger: 'blur' }],
         password: [{ required: true, message: '请填写密码', trigger: 'blur' }],
-        role: [{ required: true, message: '请选择权限', trigger: 'blur' }],
+        role_id: [{ required: true, message: '请选择权限', trigger: 'blur' }],
         status: [{ required: true, message: '请选择状态', trigger: 'blur' }]
       },
       downloadLoading: false
