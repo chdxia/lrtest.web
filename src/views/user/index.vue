@@ -1,7 +1,8 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.name" placeholder="姓名" style="width: 90px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.account" placeholder="账号" style="width: 90px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.user_name" placeholder="姓名" style="width: 90px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-input v-model="listQuery.email" placeholder="邮箱" style="width: 180px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.role_id" placeholder="角色" clearable class="filter-item" style="width: 90px">
         <el-option v-for="item in roleOptions" :key="item.key" :label="item.label" :value="item.key" />
@@ -32,9 +33,14 @@
           <span>{{ (listQuery.page-1)*listQuery.limit + $index + 1 }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="账号" width="90px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.account }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="姓名" width="90px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.name }}</span>
+          <span>{{ row.user_name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="邮箱" min-width="150px">
@@ -86,8 +92,11 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model="temp.name" />
+        <el-form-item label="账号" prop="account">
+          <el-input v-model="temp.account" />
+        </el-form-item>
+        <el-form-item label="姓名" prop="user_name">
+          <el-input v-model="temp.user_name" />
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="temp.email" />
@@ -96,7 +105,7 @@
           <el-input v-model="temp.password" />
         </el-form-item>
         <el-form-item label="角色" prop="role_id">
-          <el-select v-model="temp.role" class="filter-item" placeholder="请选择权限">
+          <el-select v-model="temp.role_id" class="filter-item" placeholder="请选择权限">
             <el-option v-for="item in roleOptions" :key="item.key" :label="item.label" :value="item.key" />
           </el-select>
         </el-form-item>
@@ -137,7 +146,8 @@ const roleOptions = [
   { key: 1, label: 'admin' },
   { key: 2, label: 'pm' },
   { key: 3, label: 'developer' },
-  { key: 4, label: 'tester' }
+  { key: 4, label: 'tester' },
+  { key: 5, label: 'visitor' }
 ]
 
 // arr to obj, such as { 1 : "admin", 2 : "editor" }
@@ -167,7 +177,8 @@ export default {
       listQuery: {
         page: 1,
         limit: 10,
-        name: undefined,
+        account: undefined,
+        user_name: undefined,
         email: undefined,
         role_id: undefined,
         status: undefined,
@@ -177,7 +188,8 @@ export default {
         { key: 1, label: 'admin' },
         { key: 2, label: 'pm' },
         { key: 3, label: 'developer' },
-        { key: 4, label: 'tester' }
+        { key: 4, label: 'tester' },
+        { key: 5, label: 'visitor' }
       ],
       statusOptions: [
         { label: '激活', value: true, display_name: 'success' },
@@ -186,7 +198,8 @@ export default {
       showReviewer: false,
       temp: {
         id: undefined,
-        name: undefined,
+        account: undefined,
+        user_name: undefined,
         email: undefined,
         password: undefined,
         role_id: undefined,
@@ -240,9 +253,10 @@ export default {
       this.getList()
     },
     handleModifyStatus(row, status) {
-      row.status = status
       const tempData = Object.assign({}, row)
+      tempData.status = status
       updateUser(tempData).then(() => {
+        row.status = status
         this.$message({
           message: '操作成功',
           type: 'success'
@@ -277,7 +291,8 @@ export default {
     resetTemp() {
       this.temp = {
         id: undefined,
-        name: undefined,
+        account: undefined,
+        user_name: undefined,
         email: undefined,
         password: undefined,
         role_id: undefined,

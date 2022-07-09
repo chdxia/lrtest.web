@@ -6,15 +6,15 @@
         <h3 class="title">lrtest</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="account">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="请输入邮箱"
-          name="username"
+          ref="account"
+          v-model="loginForm.account"
+          placeholder="请输入账号或邮箱"
+          name="account"
           type="text"
           tabindex="1"
           autocomplete="on"
@@ -61,22 +61,21 @@
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
 import SocialSign from './components/SocialSignin'
 
 export default {
   name: 'Login',
   components: { SocialSign },
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('请输入正确的邮箱'))
+    const validateAccount = (rule, value, callback) => {
+      if (value.length > 100) {
+        callback(new Error('请输入正确的账号或邮箱'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
+      if (!value) {
         callback(new Error('请输入正确的密码'))
       } else {
         callback()
@@ -84,11 +83,15 @@ export default {
     }
     return {
       loginForm: {
-        username: '',
+        account: '',
         password: ''
       },
+      loginFormVisitor: {
+        account: 'visitor',
+        password: '123456'
+      },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        account: [{ required: true, trigger: 'blur', validator: validateAccount }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       passwordType: 'password',
@@ -115,8 +118,8 @@ export default {
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
-    if (this.loginForm.username === '') {
-      this.$refs.username.focus()
+    if (this.loginForm.account === '') {
+      this.$refs.account.focus()
     } else if (this.loginForm.password === '') {
       this.$refs.password.focus()
     }
@@ -126,7 +129,7 @@ export default {
   },
   methods: {
     visitorLogin() {
-      this.loginForm.username = 'chdxiamail@gmail.com'
+      this.loginForm.account = 'visitor'
       this.loginForm.password = '123456'
       this.handleLogin()
     },
