@@ -5,7 +5,7 @@
       <el-input v-model="listQuery.user_name" placeholder="姓名" style="width: 90px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-input v-model="listQuery.email" placeholder="邮箱" style="width: 180px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.role_id" placeholder="角色" clearable class="filter-item" style="width: 90px">
-        <el-option v-for="item in roleOptions" :key="item.key" :label="item.label" :value="item.key" />
+        <el-option v-for="item in roleOptions" :key="item.id" :label="item.role_name" :value="item.id" />
       </el-select>
       <el-select v-model="listQuery.status" placeholder="状态" clearable class="filter-item" style="width: 90px">
         <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
@@ -48,14 +48,14 @@
           <span>{{ row.email }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="角色" width="90px" align="center">
+      <el-table-column label="角色" width="120px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.role_id | roleFilter }}</span>
+          <span>{{ rolesFilter(row.roles) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="状态" class-name="status-col" width="90">
         <template slot-scope="{row}">
-          <el-tag :type="getStatus(row.status) | statusFilter">
+          <el-tag :type="statusFilter(getStatus(row.status))">
             {{ getStatus(row.status) }}
           </el-tag>
         </template>
@@ -104,9 +104,9 @@
         <el-form-item label="密码" prop="password">
           <el-input v-model="temp.password" />
         </el-form-item>
-        <el-form-item label="角色" prop="role_id">
-          <el-select v-model="temp.role_id" class="filter-item" placeholder="请选择权限">
-            <el-option v-for="item in roleOptions" :key="item.key" :label="item.label" :value="item.key" />
+        <el-form-item label="角色" prop="roles">
+          <el-select v-model="temp.roles" multiple class="filter-item" placeholder="请选择权限">
+            <el-option v-for="item in roleOptions" :key="item.id" :label="item.role_name" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="状态" prop="status">
@@ -129,45 +129,14 @@
 
 <script>
 import { userList, createUser, updateUser, deleteUser } from '@/api/user'
+import { getRoles } from '@/api/role'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-
-const statusOptions = [
-  { label: '激活', value: true, display_name: 'success' },
-  { label: '停用', value: false, display_name: 'info' }
-]
-
-const statusKeyValue = statusOptions.reduce((acc, cur) => {
-  acc[cur.label] = cur.display_name
-  return acc
-}, {})
-
-const roleOptions = [
-  { key: 1, label: 'admin' },
-  { key: 2, label: 'pm' },
-  { key: 3, label: 'developer' },
-  { key: 4, label: 'tester' },
-  { key: 5, label: 'visitor' }
-]
-
-// arr to obj, such as { 1 : "admin", 2 : "editor" }
-const roleKeyValue = roleOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.label
-  return acc
-}, {})
 
 export default {
   name: 'UserTable',
   components: { Pagination },
   directives: { waves },
-  filters: {
-    statusFilter(status) {
-      return statusKeyValue[status]
-    },
-    roleFilter(role) {
-      return roleKeyValue[role]
-    }
-  },
   data() {
     return {
       tableKey: 0,
@@ -184,17 +153,13 @@ export default {
         status: undefined,
         sort: undefined
       },
-      roleOptions: [
-        { key: 1, label: 'admin' },
-        { key: 2, label: 'pm' },
-        { key: 3, label: 'developer' },
-        { key: 4, label: 'tester' },
-        { key: 5, label: 'visitor' }
-      ],
+      roleOptions: undefined,
+      roleKeyValue: { 1: 'admin', 2: 'pm' },
       statusOptions: [
         { label: '激活', value: true, display_name: 'success' },
         { label: '停用', value: false, display_name: 'info' }
       ],
+      statusKeyValue: undefined,
       showReviewer: false,
       temp: {
         id: undefined,
@@ -202,7 +167,7 @@ export default {
         user_name: undefined,
         email: undefined,
         password: undefined,
-        role_id: undefined,
+        roles: undefined,
         status: undefined
       },
       dialogFormVisible: false,
@@ -215,16 +180,36 @@ export default {
         account: [{ required: true, message: '请填写账号', trigger: 'blur' }],
         email: [{ required: true, message: '请填写邮箱', trigger: 'blur' }],
         password: [{ required: true, message: '请填写密码', trigger: 'blur' }],
-        role_id: [{ required: true, message: '请选择权限', trigger: 'blur' }],
+        roles: [{ required: true, message: '请选择权限', trigger: 'blur' }],
         status: [{ required: true, message: '请选择状态', trigger: 'blur' }]
       },
       downloadLoading: false
     }
   },
   created() {
+    getRoles().then(response => {
+      this.roleOptions = response.data
+      this.roleKeyValue = this.roleOptions.reduce((acc, item) => {
+        acc[item.id] = item.role_name
+        return acc
+      }, {})
+      this.statusKeyValue = this.statusOptions.reduce((acc, item) => {
+        acc[item.label] = item.display_name
+        return acc
+      }, {})
+    })
     this.getList()
   },
   methods: {
+    statusFilter(status) {
+      return this.statusKeyValue[status]
+    },
+    rolesFilter(roles) {
+      roles = roles.map((item) => {
+        return this.roleKeyValue[item]
+      })
+      return roles
+    },
     getStatus(status) {
       if (status === true) {
         return '激活'
@@ -240,7 +225,12 @@ export default {
         }
       }
       userList(this.listQuery).then(response => {
-        this.list = response.data.users
+        this.list = response.data.users.map((item) => {
+          item.roles = item.roles.map((item_role) => {
+            return item_role['role_id']
+          })
+          return item
+        })
         this.total = response.data.total
 
         // 模拟请求的时间，request请求成功之前，会一直转圈
@@ -296,7 +286,7 @@ export default {
         user_name: undefined,
         email: undefined,
         password: undefined,
-        role_id: undefined,
+        roles: undefined,
         status: true
       }
     },
@@ -317,6 +307,9 @@ export default {
             const listQuery = Object.assign({}, { email: this.temp.email })
             userList(listQuery).then(response => { // 根据邮箱查询用户
               const user = response.data.users[0] // 将刚刚新增的用户信息取出来（包括创建时间、修改时间）
+              user.roles = user.roles.map((item) => {
+                return item['role_id']
+              })
               this.list.unshift(user) // 展示新增的用户信息,这里直接使用this.list.unshift(this.temp)无法显示创建时间以及修改时间
               this.$notify({
                 title: '成功',
