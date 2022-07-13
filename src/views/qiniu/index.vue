@@ -17,19 +17,26 @@
       </el-upload>
     </div>
     <div class="delete">
-      <el-button type="danger">批量删除</el-button>
+      <el-button type="danger" @click="handleCheck()">批量删除</el-button>
+      <el-dialog title="提示" :visible.sync="dialogVisible" width="30%">
+        <span>确认删除所选图片？</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="deleteData()">确定</el-button>
+        </span>
+      </el-dialog>
     </div>
     <div v-loading="listLoading" class="image-list">
-      <span v-for="src in srcList" :key="src" v-loading="listLoading" class="image-button">
+      <span v-for="item in srcList" :key="item.src" v-loading="listLoading" class="image-button">
         <el-image
-          :src="src"
-          :alt="src"
+          :src="item.src"
+          :alt="item.src"
           :lazy="true"
           :preview-src-list="srcList"
           fit="cover"
           class="image"
         />
-        <el-checkbox v-model="checked" />
+        <el-checkbox v-model="item.check" />
       </span>
     </div>
   </div>
@@ -37,7 +44,7 @@
 
 <script>
 import * as qiniu from 'qiniu-js'
-import { getToken, fileList } from '@/api/qiniu'
+import { getToken, fileList, deleteFiles } from '@/api/qiniu'
 
 export default {
   name: 'Qiniu',
@@ -47,7 +54,9 @@ export default {
       key: '',
       qiniuToken: '',
       listLoading: true,
-      srcList: null
+      srcList: [],
+      checkList: [],
+      dialogVisible: false
     }
   },
   created() {
@@ -103,10 +112,40 @@ export default {
         }
       })
     },
+    handleCheck() {
+      this.checkList = []
+      this.srcList.map((item) => {
+        if (item.check === true) {
+          this.checkList.push(item.src)
+        }
+      })
+      if (this.checkList.length > 0) {
+        this.dialogVisible = true
+      } else {
+        this.$message({
+          message: '请选择图片',
+          type: 'warning'
+        })
+      }
+    },
+    deleteData() {
+      this.dialogVisible = false
+      deleteFiles(this.checkList).then(response => {
+        this.$notify({
+          title: '成功',
+          message: '成功删除所选图片',
+          type: 'success',
+          duration: 2000
+        })
+        this.getList()
+      })
+    },
     getList() {
       this.listLoading = true
       fileList().then(response => {
-        this.srcList = response.data
+        this.srcList = response.data.map((item) => {
+          return Object.assign({}, { src: item, check: false })
+        })
         setTimeout(() => {
           this.listLoading = false
         }, 0.3 * 1000)

@@ -14,3 +14,11 @@ export function fileList() {
     method: 'get'
   })
 }
+
+export function deleteFiles(data) {
+  return request({
+    url: '/qiniu/files',
+    method: 'delete',
+    data
+  })
+}
