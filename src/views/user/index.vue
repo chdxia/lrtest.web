@@ -10,7 +10,7 @@
       <el-select v-model="listQuery.status" placeholder="状态" clearable class="filter-item" style="width: 90px">
         <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
-      <el-button v-waves class="filter-item" style="margin-left: 10px" type="primary" icon="el-icon-search" @click="handleFilter">
+      <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
@@ -182,22 +182,10 @@ export default {
         password: [{ required: true, message: '请填写密码', trigger: 'blur' }],
         roles: [{ required: true, message: '请选择权限', trigger: 'blur' }],
         status: [{ required: true, message: '请选择状态', trigger: 'blur' }]
-      },
-      downloadLoading: false
+      }
     }
   },
   created() {
-    getRoles().then(response => {
-      this.roleOptions = response.data
-      this.roleKeyValue = this.roleOptions.reduce((acc, item) => {
-        acc[item.id] = item.role_name
-        return acc
-      }, {})
-      this.statusKeyValue = this.statusOptions.reduce((acc, item) => {
-        acc[item.label] = item.display_name
-        return acc
-      }, {})
-    })
     this.getList()
   },
   methods: {
@@ -219,6 +207,17 @@ export default {
     },
     getList() {
       this.listLoading = true
+      getRoles().then(response => {
+        this.roleOptions = response.data.roles
+        this.roleKeyValue = this.roleOptions.reduce((acc, item) => {
+          acc[item.id] = item.role_name
+          return acc
+        }, {})
+        this.statusKeyValue = this.statusOptions.reduce((acc, item) => {
+          acc[item.label] = item.display_name
+          return acc
+        }, {})
+      })
       for (const i in this.listQuery) {
         if (this.listQuery[i] === '') {
           this.listQuery[i] = undefined

@@ -91,15 +91,15 @@ export const constantRoutes = [
  */
 export const asyncRoutes = [
   {
-    path: '/profile',
+    path: '/personal',
     component: Layout,
     hidden: true,
     children: [
       {
         path: '',
-        component: () => import('@/views/profile/index'),
-        name: 'Profile',
-        meta: { title: '简介', icon: 'user', noCache: true }
+        component: () => import('@/views/personal/index'),
+        name: 'Personal',
+        meta: { title: '个人资料', icon: 'user', noCache: true }
       }
     ]
   },

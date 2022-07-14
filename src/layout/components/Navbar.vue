@@ -20,15 +20,12 @@
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
-          <span>{{ device }}</span>
+          <span>{{ user_name }}</span>
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
-          <router-link to="/profile">
-            <el-dropdown-item>简介</el-dropdown-item>
-          </router-link>
-          <router-link to="/">
-            <el-dropdown-item>主页</el-dropdown-item>
+          <router-link to="/personal">
+            <el-dropdown-item>个人资料</el-dropdown-item>
           </router-link>
           <a target="_blank" href="https://github.com/chdxia">
             <el-dropdown-item>Github</el-dropdown-item>
@@ -63,12 +60,9 @@ export default {
   computed: {
     ...mapGetters([
       'sidebar',
-      'account',
+      'user_name',
       'device'
-    ]),
-    data() {
-      return {}
-    }
+    ])
   },
   methods: {
     toggleSideBar() {
