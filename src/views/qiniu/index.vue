@@ -27,7 +27,7 @@
       </el-dialog>
     </div>
     <div v-loading="listLoading" class="image-list">
-      <span v-for="item in srcList" :key="item.src" v-loading="listLoading" class="image-button">
+      <span v-for="item in fileList" :key="item.src" v-loading="listLoading" class="image-button">
         <el-image
           :src="item.src"
           :alt="item.src"
@@ -54,6 +54,7 @@ export default {
       key: '',
       qiniuToken: '',
       listLoading: true,
+      fileList: [],
       srcList: [],
       checkList: [],
       dialogVisible: false
@@ -114,7 +115,7 @@ export default {
     },
     handleCheck() {
       this.checkList = []
-      this.srcList.map((item) => {
+      this.fileList.map((item) => {
         if (item.check === true) {
           this.checkList.push(item.src)
         }
@@ -143,8 +144,11 @@ export default {
     getList() {
       this.listLoading = true
       fileList().then(response => {
-        this.srcList = response.data.map((item) => {
+        this.fileList = response.data.map((item) => {
           return Object.assign({}, { src: item, check: false })
+        })
+        this.srcList = this.fileList.map((item) => {
+          return item.src
         })
         setTimeout(() => {
           this.listLoading = false
