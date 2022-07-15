@@ -1,6 +1,6 @@
 <template>
   <div>
-    pass
+    passs
   </div>
 </template>
 
