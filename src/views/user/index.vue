@@ -71,7 +71,7 @@
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
-        <template slot-scope="{row}">
+        <template slot-scope="{row,$index}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             修改
           </el-button>
@@ -81,7 +81,7 @@
           <el-button v-if="row.status" size="mini" @click="handleModifyStatus(row,false)">
             停用
           </el-button>
-          <el-button type="danger" size="mini" @click="handleDelete(row, index)">
+          <el-button type="danger" size="mini" @click="handleDelete(row, $index)">
             删除
           </el-button>
         </template>
@@ -348,15 +348,21 @@ export default {
       })
     },
     handleDelete(row, index) {
-      deleteUser(row.id).then(() => {
-        this.list.splice(index, 1)
-        this.$notify({
-          title: '成功',
-          message: '成功删除用户信息',
-          type: 'success',
-          duration: 2000
+      this.$confirm('删除该用户，是否继续？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteUser(row.id).then(() => {
+          this.list.splice(index, 1)
+          this.$notify({
+            title: '成功',
+            message: '成功删除用户信息',
+            type: 'success',
+            duration: 2000
+          })
         })
-      })
+      }).catch(() => {})
     },
     getSortClass: function(key) {
       const sort = this.listQuery.sort
