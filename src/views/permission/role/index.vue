@@ -29,8 +29,8 @@
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="90px" class-name="small-padding fixed-width">
-        <template slot-scope="{row}">
-          <el-button type="danger" size="mini" @click="handleDelete(row, index)">
+        <template slot-scope="{row,$index}">
+          <el-button type="danger" size="mini" @click="handleDelete(row, $index)">
             删除
           </el-button>
         </template>
@@ -130,13 +130,17 @@ export default {
       })
     },
     handleDelete(row, index) {
-      deleteRole(row.id).then(() => {
-        this.list.splice(index, 1)
-        this.$notify({
-          title: '成功',
-          message: '成功删除角色信息',
-          type: 'success',
-          duration: 2000
+      this.$confirm(`删除角色"${row.role_name}"，是否继续？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteRole(row.id).then(() => {
+          this.list.splice(index, 1)
+          this.$message({
+            message: `成功删除角色"${row.role_name}"`,
+            type: 'success'
+          })
         })
       })
     }

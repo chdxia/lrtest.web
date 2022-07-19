@@ -348,7 +348,7 @@ export default {
       })
     },
     handleDelete(row, index) {
-      this.$confirm('删除该用户，是否继续？', '提示', {
+      this.$confirm(`删除用户"${row.account}"，是否继续？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -357,7 +357,7 @@ export default {
           this.list.splice(index, 1)
           this.$notify({
             title: '成功',
-            message: '成功删除用户信息',
+            message: `成功删除用户"${row.account}"`,
             type: 'success',
             duration: 2000
           })
