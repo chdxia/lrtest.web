@@ -17,14 +17,7 @@
       </el-upload>
     </div>
     <div class="delete">
-      <el-button type="danger" @click="handleCheck()">批量删除</el-button>
-      <el-dialog title="提示" :visible.sync="dialogVisible" width="30%">
-        <span>确认删除所选图片？</span>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="deleteData()">确定</el-button>
-        </span>
-      </el-dialog>
+      <el-button type="danger" @click="handleDelete()">批量删除</el-button>
     </div>
     <div v-loading="listLoading" class="image-list">
       <span v-for="item in fileList" :key="item.src" v-loading="listLoading" class="image-button">
@@ -113,7 +106,7 @@ export default {
         }
       })
     },
-    handleCheck() {
+    handleDelete() {
       this.checkList = []
       this.fileList.map((item) => {
         if (item.check === true) {
@@ -121,25 +114,25 @@ export default {
         }
       })
       if (this.checkList.length > 0) {
-        this.dialogVisible = true
+        this.$confirm('此操作将永久删除文件，是否继续？', '提示', {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteFiles(this.checkList).then(response => {
+            this.$message({
+              message: '成功删除所选图片',
+              type: 'success'
+            })
+            this.getList()
+          })
+        })
       } else {
         this.$message({
           message: '请选择图片',
           type: 'warning'
         })
       }
-    },
-    deleteData() {
-      this.dialogVisible = false
-      deleteFiles(this.checkList).then(response => {
-        this.$notify({
-          title: '成功',
-          message: '成功删除所选图片',
-          type: 'success',
-          duration: 2000
-        })
-        this.getList()
-      })
     },
     getList() {
       this.listLoading = true
