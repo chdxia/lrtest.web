@@ -99,7 +99,7 @@ export const asyncRoutes = [
         path: '',
         component: () => import('@/views/personal/index'),
         name: 'Personal',
-        meta: { title: '个人资料', icon: 'user', noCache: true }
+        meta: { title: '个人中心', icon: 'user', noCache: true }
       }
     ]
   },

@@ -25,7 +25,7 @@
         </div>
         <el-dropdown-menu slot="dropdown">
           <router-link to="/personal">
-            <el-dropdown-item>个人资料</el-dropdown-item>
+            <el-dropdown-item>个人中心</el-dropdown-item>
           </router-link>
           <a target="_blank" href="https://github.com/chdxia">
             <el-dropdown-item>Github</el-dropdown-item>
