@@ -1,33 +1,29 @@
 <template>
-  <div class="image-container">
-    <div class="image-upload">
+  <div class="app-container">
+    <div class="image-container">
       <el-upload
+        class="image-upload"
         :action="uploadUrl"
         :http-request="uploadFile"
         :before-upload="beforeUpload"
         :show-file-list="false"
-        :drag="true"
         :multiple="true"
         accept=".jpeg, .jpg, .png, .gif, .svg"
       >
-        <i class="el-icon-upload" />
-        <div class="el-upload__text">
-          将图片拖到此处，或<em>点击上传</em>
-        </div>
+        <el-button type="primary" icon="el-icon-upload">批量上传</el-button>
       </el-upload>
+      <el-button style="margin-left: 10px;" type="danger" icon="el-icon-delete" @click="handleDelete()">批量删除</el-button>
     </div>
-    <div class="delete">
-      <el-button type="danger" @click="handleDelete()">批量删除</el-button>
-    </div>
+
     <div v-loading="listLoading" class="image-list">
-      <span v-for="item in fileList" :key="item.src" v-loading="listLoading" class="image-button">
+      <span v-for="item in fileList" :key="item.src" class="image-box">
         <el-image
+          class="image"
           :src="item.src"
           :alt="item.src"
           :lazy="true"
           :preview-src-list="srcList"
           fit="cover"
-          class="image"
         />
         <el-checkbox v-model="item.check" />
       </span>
@@ -153,15 +149,14 @@ export default {
 </script>
 
 <style>
-.image-button {
-  width: 200px;
-  height: 200px;
+.image-upload {
+  display: inline-block;
 }
 
 .image {
   width: 100px;
   height: 100px;
-  margin-left: 20px;
-  margin-bottom: 20px
+  margin-top: 10px;
+  border: 1px grey solid;
 }
 </style>

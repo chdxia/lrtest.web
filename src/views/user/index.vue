@@ -13,7 +13,7 @@
       <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">
         添加
       </el-button>
     </div>
@@ -93,19 +93,19 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
         <el-form-item label="账号" prop="account">
-          <el-input v-model="temp.account" />
+          <el-input v-model="temp.account" maxlength="30" placeholder="请输入账号" show-word-limit />
         </el-form-item>
         <el-form-item label="姓名" prop="user_name">
-          <el-input v-model="temp.user_name" />
+          <el-input v-model="temp.user_name" maxlength="30" placeholder="请输入姓名" show-word-limit />
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="temp.email" />
+          <el-input v-model="temp.email" maxlength="30" placeholder="请输入邮箱" show-word-limit />
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input v-model="temp.password" />
+          <el-input v-model="temp.password" maxlength="30" placeholder="请输入密码" show-password />
         </el-form-item>
         <el-form-item label="角色" prop="roles">
-          <el-select v-model="temp.roles" multiple class="filter-item" placeholder="请选择权限">
+          <el-select v-model="temp.roles" multiple class="filter-item" placeholder="请选择角色">
             <el-option v-for="item in roleOptions" :key="item.id" :label="item.role_name" :value="item.id" />
           </el-select>
         </el-form-item>
@@ -177,10 +177,10 @@ export default {
         create: '新建用户'
       },
       rules: {
-        account: [{ required: true, message: '请填写账号', trigger: 'blur' }],
-        email: [{ required: true, message: '请填写邮箱', trigger: 'blur' }],
-        password: [{ required: true, message: '请填写密码', trigger: 'blur' }],
-        roles: [{ required: true, message: '请选择权限', trigger: 'blur' }],
+        account: [{ required: true, message: '请输入账号', trigger: 'blur' }],
+        email: [{ required: true, message: '请输入邮箱', trigger: 'blur' }],
+        password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+        roles: [{ required: true, message: '请选择角色', trigger: 'blur' }],
         status: [{ required: true, message: '请选择状态', trigger: 'blur' }]
       }
     }

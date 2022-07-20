@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-button v-waves class="filter-item" type="primary" @click="getList">
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-refresh" @click="getList">
         刷新
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">
         添加
       </el-button>
     </div>
@@ -42,7 +42,7 @@
     <el-dialog title="新建角色" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="90px" style="width: 400px; margin-left:50px;">
         <el-form-item label="角色" prop="role">
-          <el-input v-model="temp.role_name" />
+          <el-input v-model="temp.role_name" maxlength="30" placeholder="请输入角色" show-word-limit />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
