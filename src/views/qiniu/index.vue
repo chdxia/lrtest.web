@@ -1,47 +1,52 @@
 <template>
-  <div class="image-container">
-    <div class="image-upload">
+  <div class="app-container">
+    <div class="image-container">
       <el-upload
+        class="image-upload"
         :action="uploadUrl"
         :http-request="uploadFile"
         :before-upload="beforeUpload"
         :show-file-list="false"
-        :drag="true"
         :multiple="true"
         accept=".jpeg, .jpg, .png, .gif, .svg"
       >
-        <i class="el-icon-upload" />
-        <div class="el-upload__text">
-          将图片拖到此处，或<em>点击上传</em>
-        </div>
+        <el-button type="primary" icon="el-icon-upload">批量上传</el-button>
       </el-upload>
+      <el-button style="margin-left: 10px;" type="danger" icon="el-icon-delete" @click="handleDelete()">批量删除</el-button>
     </div>
+
     <div v-loading="listLoading" class="image-list">
-      <el-image
-        v-for="src in srcList"
-        :key="src"
-        :src="src"
-        :alt="src"
-        :lazy="true"
-        :preview-src-list="srcList"
-        style="width: 100px; height: 100px"
-      />
+      <span v-for="item in fileList" :key="item.src" class="image-box">
+        <el-image
+          class="image"
+          :src="item.src"
+          :alt="item.src"
+          :lazy="true"
+          :preview-src-list="srcList"
+          fit="cover"
+        />
+        <el-checkbox v-model="item.check" />
+      </span>
     </div>
   </div>
 </template>
 
 <script>
 import * as qiniu from 'qiniu-js'
-import { getToken, fileList } from '@/api/qiniu'
+import { getToken, fileList, deleteFiles } from '@/api/qiniu'
 
 export default {
+  name: 'Qiniu',
   data() {
     return {
       uploadUrl: 'https://upload-z2.qiniup.com',
       key: '',
       qiniuToken: '',
       listLoading: true,
-      srcList: null
+      fileList: [],
+      srcList: [],
+      checkList: [],
+      dialogVisible: false
     }
   },
   created() {
@@ -97,10 +102,43 @@ export default {
         }
       })
     },
+    handleDelete() {
+      this.checkList = []
+      this.fileList.map((item) => {
+        if (item.check === true) {
+          this.checkList.push(item.src)
+        }
+      })
+      if (this.checkList.length > 0) {
+        this.$confirm('此操作将永久删除文件，是否继续？', '提示', {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteFiles(this.checkList).then(response => {
+            this.$message({
+              message: '成功删除所选图片',
+              type: 'success'
+            })
+            this.getList()
+          })
+        })
+      } else {
+        this.$message({
+          message: '请选择图片',
+          type: 'warning'
+        })
+      }
+    },
     getList() {
       this.listLoading = true
       fileList().then(response => {
-        this.srcList = response.data
+        this.fileList = response.data.map((item) => {
+          return Object.assign({}, { src: item, check: false })
+        })
+        this.srcList = this.fileList.map((item) => {
+          return item.src
+        })
         setTimeout(() => {
           this.listLoading = false
         }, 0.3 * 1000)
@@ -109,3 +147,16 @@ export default {
   }
 }
 </script>
+
+<style>
+.image-upload {
+  display: inline-block;
+}
+
+.image {
+  width: 100px;
+  height: 100px;
+  margin-top: 10px;
+  border: 1px grey solid;
+}
+</style>

@@ -1,31 +1,32 @@
 <template>
-  <div class="dashboard-container">
-    <component :is="currentRole" />
+  <div class="dashboard-editor-container">
+    <github-corner class="github-corner" />
+    <div style="text-align:center;">Welcome to LRTest</div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import AdminHome from './admin'
-import EditorHome from './editor'
+import GithubCorner from '@/components/GithubCorner'
 
 export default {
   name: 'Home',
-  components: { AdminHome, EditorHome },
-  data() {
-    return {
-      currentRole: 'AdminHome'
-    }
-  },
-  computed: {
-    ...mapGetters([
-      'roles'
-    ])
-  },
-  created() {
-    if (!this.roles.includes('admin')) {
-      this.currentRole = 'EditorHome'
-    }
+  components: {
+    GithubCorner
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.dashboard-editor-container {
+  padding: 32px;
+  background-color: rgb(240, 242, 245);
+  position: relative;
+
+  .github-corner {
+    position: absolute;
+    top: 0px;
+    border: 0;
+    right: 0;
+  }
+}
+</style>

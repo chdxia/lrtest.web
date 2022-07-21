@@ -11,6 +11,7 @@ import Layout from '@/layout'
 // import chartsRouter from './modules/charts'
 // import tableRouter from './modules/table'
 // import nestedRouter from './modules/nested'
+import permissionRouter from './modules/permission'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -90,15 +91,15 @@ export const constantRoutes = [
  */
 export const asyncRoutes = [
   {
-    path: '/profile',
+    path: '/personal',
     component: Layout,
     hidden: true,
     children: [
       {
         path: '',
-        component: () => import('@/views/profile/index'),
-        name: 'Profile',
-        meta: { title: '简介', icon: 'user', noCache: true }
+        component: () => import('@/views/personal/index'),
+        name: 'Personal',
+        meta: { title: '个人中心', icon: 'user', noCache: true }
       }
     ]
   },
@@ -127,18 +128,6 @@ export const asyncRoutes = [
     ]
   },
   {
-    path: '/item',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        component: () => import('@/views/item/index'),
-        name: 'ItemTable',
-        meta: { title: '物品管理', icon: 'shopping' }
-      }
-    ]
-  },
-  {
     path: '/qiniu',
     component: Layout,
     children: [
@@ -152,6 +141,7 @@ export const asyncRoutes = [
   },
   /** when your routing map is too long, you can split it into small modules **/
   // tableRouter,
+  permissionRouter,
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
