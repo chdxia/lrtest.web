@@ -104,7 +104,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     },
     build: {
       minify: 'terser',
-      outDir: env.VITE_OUT_DIR || 'dist',
+      outDir: 'dist',
       sourcemap: env.VITE_SOURCEMAP === 'true' ? 'inline' : false,
       // brotliSize: false,
       terserOptions: {

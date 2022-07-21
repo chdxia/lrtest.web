@@ -14,19 +14,19 @@ pipeline {
           server = getServer()
         }
         // 在远程主机上删除项目文件
-        sshCommand remote: server, command: 'rm -rf /usr/share/nginx/lrtest-web/dist-pro'
+        sshCommand remote: server, command: 'rm -rf /usr/share/nginx/lrtest-web/dist'
       }
     }
     stage('本地构建') {
       steps {
         // 删除历史构建，重新在本地构建
-        sh 'rm -rf ./dist-pro && npm -g install pnpm && pnpm install && pnpm run build:pro'
+        sh 'rm -rf ./dist && npm -g install pnpm && pnpm install && pnpm run build:pro'
       }
     }
     stage('远程部署') {
       steps {
         // 将构建好的文件部署到远程服务器
-        sshPut remote: server, from: "dist-pro", into: "/usr/share/nginx/lrtest-web"
+        sshPut remote: server, from: "dist", into: "/usr/share/nginx/lrtest-web"
       }
     }
   }
