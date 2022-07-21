@@ -14,16 +14,16 @@ const config: {
    */
   base_url: {
     // 开发环境接口前缀
-    base: 'api/v1',
+    base: '/api/v1',
 
     // 打包开发环境接口前缀
-    dev: 'api/v1',
+    dev: '/api/v1',
 
     // 打包生产环境接口前缀
-    pro: 'api/v1',
+    pro: '/api/v1',
 
     // 打包测试环境接口前缀
-    test: 'api/v1'
+    test: '/api/v1'
   },
 
   /**

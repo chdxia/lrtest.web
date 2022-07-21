@@ -1,3 +1,33 @@
+<script setup lang="ts">
+import { LoginForm, RegisterForm } from './components'
+import { ThemeSwitch } from '@/components/ThemeSwitch'
+import { LocaleDropdown } from '@/components/LocaleDropdown'
+import { useI18n } from '@/hooks/web/useI18n'
+import { underlineToHump } from '@/utils'
+import { useAppStore } from '@/store/modules/app'
+import { useDesign } from '@/hooks/web/useDesign'
+import { ref } from 'vue'
+
+const { getPrefixCls } = useDesign()
+
+const prefixCls = getPrefixCls('login')
+
+const appStore = useAppStore()
+console.log(appStore)
+
+const { t } = useI18n()
+
+const isLogin = ref(true)
+
+const toRegister = () => {
+  isLogin.value = false
+}
+
+const toLogin = () => {
+  isLogin.value = true
+}
+</script>
+
 <template>
   <div
     :class="prefixCls"
@@ -46,38 +76,17 @@
               class="p-20px h-auto m-auto <xl:(rounded-3xl light:bg-white)"
               @to-register="toRegister"
             />
+            <RegisterForm
+              v-else
+              class="p-20px h-auto m-auto <xl:(rounded-3xl light:bg-white)"
+              @to-login="toLogin"
+            />
           </div>
         </Transition>
       </div>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { LoginForm } from './components'
-import { ThemeSwitch } from '@/components/ThemeSwitch'
-import { LocaleDropdown } from '@/components/LocaleDropdown'
-import { useI18n } from '@/hooks/web/useI18n'
-import { underlineToHump } from '@/utils'
-import { useAppStore } from '@/store/modules/app'
-import { useDesign } from '@/hooks/web/useDesign'
-import { ref } from 'vue'
-
-const { getPrefixCls } = useDesign()
-
-const prefixCls = getPrefixCls('login')
-
-const appStore = useAppStore()
-console.log(appStore)
-
-const { t } = useI18n()
-
-const isLogin = ref(true)
-
-const toRegister = () => {
-  isLogin.value = false
-}
-</script>
 
 <style lang="less" scoped>
 @prefix-cls: ~'@{namespace}-login';
