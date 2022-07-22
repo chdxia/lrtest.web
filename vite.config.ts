@@ -9,7 +9,6 @@ import VueI18n from '@intlify/vite-plugin-vue-i18n'
 import styleImport, { ElementPlusResolve } from 'vite-plugin-style-import'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import PurgeIcons from 'vite-plugin-purge-icons'
-import { viteMockServe } from 'vite-plugin-mock'
 import DefineOptions from 'unplugin-vue-define-options/vite'
 import { createHtmlPlugin } from 'vite-plugin-html'
 
@@ -59,17 +58,6 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         svgoOptions: true
       }),
       PurgeIcons(),
-      viteMockServe({
-        ignore: /^\_/,
-        mockPath: 'mock',
-        localEnabled: !isBuild,
-        prodEnabled: isBuild,
-        injectCode: `
-          import { setupProdMockServer } from '../mock/_createProductionServer'
-
-          setupProdMockServer()
-          `
-      }),
       DefineOptions(),
       createHtmlPlugin({
         inject: {
@@ -120,7 +108,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         '/api/v1': {
           target: 'http://127.0.0.1:8082',
           changeOrigin: true,
-          rewrite: path => path.replace(/^\/api\/v1/, '')
+          rewrite: (path) => path.replace(/^\/api\/v1/, '/api/v1')
         }
       },
       hmr: {
