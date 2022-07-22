@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { LoginForm, RegisterForm } from './components'
+import { LoginForm } from './components'
 import { ThemeSwitch } from '@/components/ThemeSwitch'
-import { LocaleDropdown } from '@/components/LocaleDropdown'
-import { useI18n } from '@/hooks/web/useI18n'
 import { underlineToHump } from '@/utils'
 import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'
@@ -13,19 +11,8 @@ const { getPrefixCls } = useDesign()
 const prefixCls = getPrefixCls('login')
 
 const appStore = useAppStore()
-console.log(appStore)
-
-const { t } = useI18n()
 
 const isLogin = ref(true)
-
-const toRegister = () => {
-  isLogin.value = false
-}
-
-const toLogin = () => {
-  isLogin.value = true
-}
 </script>
 
 <template>
@@ -38,7 +25,6 @@ const toLogin = () => {
         :class="`${prefixCls}__left flex-1 bg-gray-500 bg-opacity-20 relative p-30px <xl:hidden`"
       >
         <div class="flex items-center relative text-white">
-          <img src="@/assets/imgs/logo.png" alt="" class="w-48px h-48px mr-10px" />
           <span class="text-20px font-bold">{{ underlineToHump(appStore.getTitle) }}</span>
         </div>
         <div class="flex justify-center items-center h-[calc(100%-60px)]">
@@ -48,9 +34,9 @@ const toLogin = () => {
             enter-active-class="animate__animated animate__bounceInLeft"
           >
             <img src="@/assets/svgs/login-box-bg.svg" key="1" alt="" class="w-350px" />
-            <div class="text-3xl text-white" key="2">{{ t('login.welcome') }}</div>
+            <div class="text-3xl text-white" key="2">欢迎使用本系统</div>
             <div class="mt-5 font-normal text-white text-14px" key="3">
-              {{ t('login.message') }}
+              开箱即用的中后台管理系统
             </div>
           </TransitionGroup>
         </div>
@@ -64,7 +50,6 @@ const toLogin = () => {
 
           <div class="flex justify-end items-center space-x-10px">
             <ThemeSwitch />
-            <LocaleDropdown class="<xl:text-white dark:text-white" />
           </div>
         </div>
         <Transition appear enter-active-class="animate__animated animate__bounceInRight">
@@ -74,12 +59,6 @@ const toLogin = () => {
             <LoginForm
               v-if="isLogin"
               class="p-20px h-auto m-auto <xl:(rounded-3xl light:bg-white)"
-              @to-register="toRegister"
-            />
-            <RegisterForm
-              v-else
-              class="p-20px h-auto m-auto <xl:(rounded-3xl light:bg-white)"
-              @to-login="toLogin"
             />
           </div>
         </Transition>

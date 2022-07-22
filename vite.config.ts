@@ -117,11 +117,10 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     server: {
       port: 8080,
       proxy: {
-        // 选项写法
-        '/api': {
+        '/api/v1': {
           target: 'http://127.0.0.1:8082',
           changeOrigin: true,
-          rewrite: path => path.replace(/^\/api/, '')
+          rewrite: path => path.replace(/^\/api\/v1/, '')
         }
       },
       hmr: {

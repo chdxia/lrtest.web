@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref, unref, watch } from 'vue'
 import { Form } from '@/components/Form'
-import { useI18n } from '@/hooks/web/useI18n'
 import { ElButton, ElCheckbox, ElLink } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'
 import { loginApi, getTestRoleApi, getAdminRoleApi } from '@/api/login'
@@ -15,8 +14,6 @@ import { useValidator } from '@/hooks/web/useValidator'
 
 const { required } = useValidator()
 
-const emit = defineEmits(['to-register'])
-
 const appStore = useAppStore()
 
 const permissionStore = usePermissionStore()
@@ -25,10 +22,8 @@ const { currentRoute, addRoute, push } = useRouter()
 
 const { wsCache } = useCache()
 
-const { t } = useI18n()
-
 const rules = {
-  username: [required()],
+  account: [required()],
   password: [required()]
 }
 
@@ -40,21 +35,21 @@ const schema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'username',
-    label: t('login.username'),
-    value: 'admin',
+    field: 'account',
+    label: '账号',
+    value: '',
     component: 'Input',
     colProps: {
       span: 24
     },
     componentProps: {
-      placeholder: t('login.usernamePlaceholder')
+      placeholder: '请输入账号或邮箱'
     }
   },
   {
     field: 'password',
-    label: t('login.password'),
-    value: 'admin',
+    label: '密码',
+    value: '',
     component: 'InputPassword',
     colProps: {
       span: 24
@@ -63,7 +58,7 @@ const schema = reactive<FormSchema[]>([
       style: {
         width: '100%'
       },
-      placeholder: t('login.passwordPlaceholder')
+      placeholder: '请输入密码'
     }
   },
   {
@@ -81,7 +76,7 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'other',
     component: 'Divider',
-    label: t('login.otherLogin'),
+    label: '其他登录方式',
     componentProps: {
       contentPosition: 'center'
     }
@@ -119,11 +114,13 @@ watch(
 // 登录
 const signIn = async () => {
   const formRef = unref(elFormRef)
+  console.log(formRef)
   await formRef?.validate(async (isValid) => {
     if (isValid) {
       loading.value = true
       const { getFormData } = methods
       const formData = await getFormData<UserType>()
+      console.log('123223')
 
       try {
         const res = await loginApi(formData)
@@ -144,18 +141,18 @@ const getRole = async () => {
   const { getFormData } = methods
   const formData = await getFormData<UserType>()
   const params = {
-    roleName: formData.username
+    roleName: formData.account
   }
   // admin - 模拟后端过滤菜单
   // test - 模拟前端过滤菜单
   const res =
-    formData.username === 'admin' ? await getAdminRoleApi(params) : await getTestRoleApi(params)
+    formData.account === 'admin' ? await getAdminRoleApi(params) : await getTestRoleApi(params)
   if (res) {
     const { wsCache } = useCache()
     const routers = res.data || []
     wsCache.set('roleRouters', routers)
 
-    formData.username === 'admin'
+    formData.account === 'admin'
       ? await permissionStore.generateRoutes('admin', routers).catch(() => {})
       : await permissionStore.generateRoutes('test', routers).catch(() => {})
 
@@ -165,11 +162,6 @@ const getRole = async () => {
     permissionStore.setIsAddRouters(true)
     push({ path: redirect.value || permissionStore.addRouters[0].path })
   }
-}
-
-// 去注册页面
-const toRegister = () => {
-  emit('to-register')
 }
 </script>
 
@@ -184,25 +176,20 @@ const toRegister = () => {
     @register="register"
   >
     <template #title>
-      <h2 class="text-2xl font-bold text-center w-[100%]">{{ t('login.login') }}</h2>
+      <h2 class="text-2xl font-bold text-center w-[100%]">登录</h2>
     </template>
 
     <template #tool>
       <div class="flex justify-between items-center w-[100%]">
-        <ElCheckbox v-model="remember" :label="t('login.remember')" size="small" />
-        <ElLink type="primary" :underline="false">{{ t('login.forgetPassword') }}</ElLink>
+        <ElCheckbox v-model="remember" label="记住我" size="small" />
+        <ElLink type="primary" :underline="false">忘记密码</ElLink>
       </div>
     </template>
 
     <template #login>
       <div class="w-[100%]">
         <ElButton :loading="loading" type="primary" class="w-[100%]" @click="signIn">
-          {{ t('login.login') }}
-        </ElButton>
-      </div>
-      <div class="w-[100%] mt-15px">
-        <ElButton class="w-[100%]" @click="toRegister">
-          {{ t('login.register') }}
+          登录
         </ElButton>
       </div>
     </template>

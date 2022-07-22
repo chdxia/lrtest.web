@@ -8,12 +8,12 @@ interface RoleParams {
 const request = useAxios()
 
 export const loginApi = async (data: UserType): Promise<IResponse<UserType>> => {
-  const res = await request.post({ url: '/user/login', data })
+  const res = await request.post({ url: '/login', data })
   return res && res.data
 }
 
-export const loginOutApi = async (): Promise<IResponse> => {
-  const res = await request.get({ url: '/user/loginOut' })
+export const logOutApi = async (): Promise<IResponse> => {
+  const res = await request.get({ url: '/logout' })
   return res && res.data
 }
 
