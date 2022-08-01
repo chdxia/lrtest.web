@@ -12,15 +12,15 @@ const permissionRouter = {
   children: [
     {
       path: 'role',
-      name: 'Role',
-      component: () => import('@/views/Permission/Role/index'),
+      name: 'RoleTable',
+      component: () => import('@/views/Permission/RoleTable'),
       meta: { title: '角色管理' }
     },
     {
-      path: 'page',
-      name: 'Page',
-      component: () => import('@/views/Permission/Page/index'),
-      meta: { title: '页面管理' }
+      path: 'route',
+      name: 'RouteTable',
+      component: () => import('@/views/Permission/RouteTable'),
+      meta: { title: '路由管理' }
     }
   ]
 }

@@ -5,8 +5,10 @@ import { resetRouter } from '@/router'
 const getDefaultState = () => {
   return {
     token: getToken(),
-    name: '',
-    avatar: ''
+    account: '',
+    user_name: '',
+    email: '',
+    roles: []
   }
 }
 
@@ -19,23 +21,29 @@ const mutations = {
   SET_TOKEN: (state, token) => {
     state.token = token
   },
-  SET_NAME: (state, name) => {
-    state.name = name
+  SET_ACCOUNT: (state, account) => {
+    state.account = account
   },
-  SET_AVATAR: (state, avatar) => {
-    state.avatar = avatar
+  SET_USER_NAME: (state, user_name) => {
+    state.user_name = user_name
+  },
+  SET_EMAIL: (state, email) => {
+    state.email = email
+  },
+  SET_ROLES: (state, roles) => {
+    state.roles = roles
   }
 }
 
 const actions = {
-  // user login
+  // 用户登录
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
+    const { account, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login({ account: account.trim(), password: password }).then(response => {
         const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+        commit('SET_TOKEN', data.access_token)
+        setToken(data.access_token)
         resolve()
       }).catch(error => {
         reject(error)
@@ -43,20 +51,26 @@ const actions = {
     })
   },
 
-  // get user info
-  getInfo({ commit, state }) {
+  // 获取用户信息
+  getInfo({ commit }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      getInfo().then(response => {
         const { data } = response
 
         if (!data) {
-          reject('Verification failed, please Login again.')
+          reject('获取用户信息失败，请重新登录')
         }
 
-        const { name, avatar } = data
+        const { account, user_name, email } = data
 
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
+        const roles = [2, 3]
+        if (!roles || roles.length <= 0) {
+          reject('获取用户信息时，roles必须是非空数组')
+        }
+        commit('SET_ACCOUNT', account)
+        commit('SET_USER_NAME', user_name)
+        commit('SET_EMAIL', email)
+        commit('SET_ROLES', roles)
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -64,11 +78,11 @@ const actions = {
     })
   },
 
-  // user logout
-  logout({ commit, state }) {
+  // 退出登录
+  logout({ commit }) {
     return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
-        removeToken() // must remove  token  first
+      logout().then(() => {
+        removeToken() // 必须优先移除token
         resetRouter()
         commit('RESET_STATE')
         resolve()
@@ -78,10 +92,10 @@ const actions = {
     })
   },
 
-  // remove token
+  // 重置token，重置用户信息
   resetToken({ commit }) {
     return new Promise(resolve => {
-      removeToken() // must remove  token  first
+      removeToken() // 必须优先移除token
       commit('RESET_STATE')
       resolve()
     })
