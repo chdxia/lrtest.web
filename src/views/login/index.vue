@@ -51,14 +51,6 @@
       </div>
 
     </el-form>
-
-    <el-dialog title="Or connect with" :visible.sync="showDialog">
-      Can not be simulated on local, so please combine you own business simulation! ! !
-      <br>
-      <br>
-      <br>
-      <social-sign />
-    </el-dialog>
   </div>
 </template>
 
@@ -67,32 +59,31 @@ export default {
   name: 'Login',
   data() {
     const validateAccount = (rule, value, callback) => {
-      if (value.length > 100) {
-        callback(new Error('请输入正确的账号或邮箱'))
+      if (!value) {
+        callback(new Error('请输入账号或邮箱'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
       if (!value) {
-        callback(new Error('请输入正确的密码'))
+        callback(new Error('请输入密码'))
       } else {
         callback()
       }
     }
     return {
       loginForm: {
-        username: '',
+        account: '',
         password: ''
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateAccount }],
+        account: [{ required: true, trigger: 'blur', validator: validateAccount }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       capsTooltip: false,
       loading: false,
       passwordType: 'password',
-      showDialog: false,
       redirect: undefined
     }
   },
@@ -107,7 +98,7 @@ export default {
   methods: {
     visitorLogin() {
       this.loginForm.account = 'visitor'
-      this.loginForm.password = '123456'
+      this.loginForm.password = '233456'
       this.handleLogin()
     },
     checkCapslock(e) {

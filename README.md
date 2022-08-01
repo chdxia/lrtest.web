@@ -4,7 +4,7 @@
     <img src="https://img.shields.io/badge/vue--admin--template-4.4.0-brightgreen.svg" alt="vue-admin-template">
 </a>
 
-基于vue-admin-template模板开发的一个测试工具平台（前端）
+基于vue-admin-template模板开发的一个测试工具（前端）
 
 项目演示传送门：https://lrtest.chdxia.com
 

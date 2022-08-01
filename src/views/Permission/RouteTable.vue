@@ -1,6 +1,6 @@
 <template>
   <div>
-    passs
+    动态路由功能
   </div>
 </template>
 

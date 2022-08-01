@@ -1,6 +1,6 @@
 <template>
   <div>
-    pass
+    UserInfo
   </div>
 </template>
 
