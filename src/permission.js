@@ -24,19 +24,15 @@ router.beforeEach(async(to, from, next) => {
       NProgress.done()
     } else {
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
-      console.log(store.getters.roles)
       if (hasRoles) {
         next()
       } else {
         try {
           const { roles } = await store.dispatch('user/getInfo') // 尝试获取当前用户的roles
-          console.log(roles)
-          const roles1 = [1]
 
-          const accessRoutes = await store.dispatch('permission/generateRoutes', roles1) // 根据当前用户的roles初始化路由表
+          const accessRoutes = await store.dispatch('permission/generateRoutes', roles) // 根据当前用户的roles初始化路由表
 
           router.addRoutes(accessRoutes) // 动态添加路由表
-          console.log('动态添加路由表')
 
           next({ ...to, replace: true })
         } catch (error) { // 无法获取当前用户的roles，移除token并跳转到登录页

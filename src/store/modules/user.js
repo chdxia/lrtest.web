@@ -8,7 +8,8 @@ const getDefaultState = () => {
     account: '',
     user_name: '',
     email: '',
-    roles: []
+    roles: [],
+    tasks: []
   }
 }
 
@@ -32,6 +33,9 @@ const mutations = {
   },
   SET_ROLES: (state, roles) => {
     state.roles = roles
+  },
+  SET_TASKS: (state, tasks) => {
+    state.tasks = tasks
   }
 }
 
@@ -61,9 +65,8 @@ const actions = {
           reject('获取用户信息失败，请重新登录')
         }
 
-        const { account, user_name, email } = data
+        const { account, user_name, email, roles, tasks } = data
 
-        const roles = [2, 3]
         if (!roles || roles.length <= 0) {
           reject('获取用户信息时，roles必须是非空数组')
         }
@@ -71,6 +74,7 @@ const actions = {
         commit('SET_USER_NAME', user_name)
         commit('SET_EMAIL', email)
         commit('SET_ROLES', roles)
+        commit('SET_TASKS', tasks)
         resolve(data)
       }).catch(error => {
         reject(error)
