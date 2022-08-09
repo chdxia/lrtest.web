@@ -53,7 +53,7 @@
           <span>{{ rolesFilter(row.roles) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" class-name="status-col" width="90">
+      <el-table-column label="状态" class-name="status-col" width="70" align="center">
         <template slot-scope="{row}">
           <el-tag :type="statusFilter(getStatus(row.status))">
             {{ getStatus(row.status) }}
@@ -225,11 +225,11 @@ export default {
       }
       userList(this.listQuery).then(response => {
         this.list = response.data.users.map((item) => {
-          item.roles = item.roles.map((item_role) => {
-            return item_role['role_id']
-          })
+          item.create_time = item.create_time.substr(0, 19)
+          item.update_time = item.update_time.substr(0, 19)
           return item
         })
+
         this.total = response.data.total
 
         // 模拟请求的时间，request请求成功之前，会一直转圈
@@ -264,7 +264,7 @@ export default {
     },
     sortByCreateTime(order) {
       if (order === 'ascending') {
-        this.listQuery.sort = '+create_time'
+        this.listQuery.sort = 'create_time'
       } else {
         this.listQuery.sort = '-create_time'
       }
@@ -272,7 +272,7 @@ export default {
     },
     sortByUpdateTime(order) {
       if (order === 'ascending') {
-        this.listQuery.sort = '+update_time'
+        this.listQuery.sort = 'update_time'
       } else {
         this.listQuery.sort = '-update_time'
       }
