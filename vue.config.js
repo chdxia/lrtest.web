@@ -6,51 +6,36 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || 'lrtest' // page title
+const name = defaultSettings.title || 'lrtest' // 页面标题
 
-// If your port is set to 80,
-// use administrator privileges to execute the command line.
-// For example, Mac: sudo npm run
-// You can change the port by the following method:
-// port = 9527 npm run dev OR npm run dev --port = 9527
-const port = process.env.port || process.env.npm_config_port || 8080 // dev port
+const port = process.env.port || process.env.npm_config_port || 8080 // dev端口号
 
-// All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
-  /**
-   * You will need to set publicPath if you plan to deploy your site under a sub path,
-   * for example GitHub Pages. If you plan to deploy your site to https://foo.github.io/bar/,
-   * then publicPath should be set to "/bar/".
-   * In most cases please use '/' !!!
-   * Detail: https://cli.vuejs.org/config/#publicpath
-   */
-  // 如果使用nginx代理，生产环境history模式下使用'./'路径
-  publicPath: process.env.NODE_ENV === 'production' ? '/' : './',
+  // 如果使用nginx代理和history模式，生产环境下使用'./'路径
+  // publicPath: process.env.NODE_ENV === 'production' ? '/' : './',
+  publicPath: './',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
   productionSourceMap: false,
   devServer: {
     port: port,
-    open: false,
+    open: true,
     overlay: {
       warnings: false,
       errors: true
     },
-    // before: require('./mock/mock-server.js')
-    proxy: {
-      [process.env.VUE_APP_BASE_API]: {
+    proxy: { // 跨域代理
+      '/api/v1': {
         target: 'http://localhost:8082',
         changeOrigin: true,
         pathRewrite: {
-          ['^' + process.env.VUE_APP_BASE_API]: '/api/v1'
+          ['^' + '/api/v1']: '/api/v1'
         }
       }
     }
   },
   configureWebpack: {
-    // provide the app's title in webpack's name field, so that
-    // it can be accessed in index.html to inject the correct title.
     name: name,
     resolve: {
       alias: {

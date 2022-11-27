@@ -19,11 +19,7 @@ export default {
     }
   },
   watch: {
-    $route(route) {
-      // if you go to the redirect page, do not update the breadcrumbs
-      if (route.path.startsWith('/redirect/')) {
-        return
-      }
+    $route() {
       this.getBreadcrumb()
     }
   },
@@ -36,18 +32,18 @@ export default {
       let matched = this.$route.matched.filter(item => item.meta && item.meta.title)
       const first = matched[0]
 
-      if (!this.isHome(first)) {
-        matched = [{ path: '/home', meta: { title: 'Home' }}].concat(matched)
+      if (!this.isDashboard(first)) {
+        matched = [{ path: '/dashboard', meta: { title: 'Dashboard' }}].concat(matched)
       }
 
       this.levelList = matched.filter(item => item.meta && item.meta.title && item.meta.breadcrumb !== false)
     },
-    isHome(route) {
+    isDashboard(route) {
       const name = route && route.name
       if (!name) {
         return false
       }
-      return name.trim().toLocaleLowerCase() === 'Home'.toLocaleLowerCase()
+      return name.trim().toLocaleLowerCase() === 'Dashboard'.toLocaleLowerCase()
     },
     pathCompile(path) {
       // To solve this problem https://github.com/PanJiaChen/vue-element-admin/issues/561
