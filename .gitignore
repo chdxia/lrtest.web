@@ -1,7 +1,0 @@
-.DS_Store
-.vscode
-.git
-node_modules
-dist
-*.local
-*-lock.*
